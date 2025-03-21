@@ -30,7 +30,7 @@ export const getTeams = async () => {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
 
-    const res = await fetch('http://localhost:5000/api/users/teams', { // ✅ שם הנתיב עודכן
+    const res = await fetch(TEAM_API_URL,{ 
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
