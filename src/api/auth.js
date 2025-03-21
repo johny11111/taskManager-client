@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
+//const API_URL = 'http://localhost:5000/api/users';
+
 
 export const registerUser = async (userData) => {
     const res = await fetch(`${API_URL}/register`, {
