@@ -238,7 +238,8 @@
 
 .card {
   width: 90%;
-  max-height: 50dvh;
+  height: max-content !important;
+  
 }
 
 .btnLogin {
