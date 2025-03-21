@@ -2,13 +2,18 @@ const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
 //const API_URL = 'http://localhost:5000/api/users';
 
 
-export const registerUser = async (userData) => {
-    const res = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-    });
-    return res.json();
+export const registerUser = async ({ name, email, password, token }) => {
+    try {
+        const res = await fetch('http://localhost:5000/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, token })
+        });
+        return await res.json();
+    } catch (err) {
+        console.error(err);
+        return { message: "שגיאה בהרשמה" };
+    }
 };
 
 export const loginUser = async (userData) => {

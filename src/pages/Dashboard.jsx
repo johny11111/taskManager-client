@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTasksByTeam, updateTaskStatus, deleteTask, getUsers, getTeamById, createTaskForTeam } from '../api/tasks';
 import TaskForm from '../components/TaskForm';
-import { Container, Row, Col, ListGroup, Badge, Button, Modal, Nav } from 'react-bootstrap';
+import { Container, Row, Col, ListGroup, Badge, Button, Modal, Nav , Form } from 'react-bootstrap';
 
 const Dashboard = () => {
     const { teamId } = useParams();
@@ -14,8 +14,9 @@ const Dashboard = () => {
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [selectedTab, setSelectedTab] = useState('today');
     const [userId, setUserId] = useState(null);
-    const [taskToRevert, setTaskToRevert] = useState(null);
-    const [showRevertModal, setShowRevertModal] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteMessage, setInviteMessage] = useState('');
+
 
 
     useEffect(() => {
@@ -127,6 +128,42 @@ const Dashboard = () => {
         });
     };
 
+    const handleSendInvite = async () => {
+        if (!inviteEmail.trim()) {
+            setInviteMessage('🛑 נא להזין כתובת מייל');
+            return;
+        }
+    
+        // ודא שאתה לוקח teamId נכון מהפרמטרים או מה-state
+        const teamId = '67ddf8dcf3ada2f279c39681'; // בדיקה זמנית (קח אותו מה-state או useParams)
+    
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:5000/api/users/invite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ email: inviteEmail, teamId }) // ← וודא ש־teamId נשלח!
+            });
+    
+            const data = await res.json();
+    
+            if (res.ok) {
+                setInviteMessage('✅ ההזמנה נשלחה בהצלחה!');
+                setInviteEmail('');
+            } else {
+                setInviteMessage(`❌ שגיאה: ${data.message}`);
+            }
+        } catch (err) {
+            console.error('❌ שגיאה בשליחת ההזמנה:', err);
+            setInviteMessage('❌ שגיאה בשליחת ההזמנה');
+        }
+    };
+    
+
+
     return (
         <Container className="containerDashboard mt-4">
             {team ? (
@@ -134,6 +171,8 @@ const Dashboard = () => {
             ) : (
                 <h1 className="text-center">📋 טוען ...</h1>
             )}
+
+            
 
             <Nav variant="tabs" className="mb-3 justify-content-center">
                 {['today', 'upcoming', 'completed', 'all'].map(tab => (
@@ -151,6 +190,25 @@ const Dashboard = () => {
                     </Nav.Item>
                 ))}
             </Nav>
+
+            <Row className="justify-content-center mb-4">
+                <Col md={6}>
+                    <Form.Group>
+                        <Form.Label>הזמן חבר לצוות לפי מייל 📧</Form.Label>
+                        <Form.Control
+                            type="email"
+                            placeholder="הזן כתובת מייל"
+                            value={inviteEmail}
+                            onChange={(e) => setInviteEmail(e.target.value)}
+                        />
+                        <Button variant="success" className="mt-2" onClick={handleSendInvite}>
+                            ✉️ שלח הזמנה
+                        </Button>
+                        {inviteMessage && <p className="mt-2">{inviteMessage}</p>}
+                    </Form.Group>
+                </Col>
+            </Row>
+
 
             <Row className="justify-content-center">
                 <Col md={8}>
