@@ -14,7 +14,10 @@ const Dashboard = () => {
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [selectedTab, setSelectedTab] = useState('today');
     const [userId, setUserId] = useState(null);
-    
+    const [taskToRevert, setTaskToRevert] = useState(null);
+    const [showRevertModal, setShowRevertModal] = useState(false);
+
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -24,7 +27,7 @@ const Dashboard = () => {
             console.warn("🚨 אין משתמש מחובר ב-LocalStorage!");
         }
     }, []);
-    
+
 
     useEffect(() => {
         const fetchTeamDetails = async () => {
@@ -35,15 +38,15 @@ const Dashboard = () => {
                 console.error("❌ שגיאה בקבלת פרטי הצוות:", error);
             }
         };
-    
+
         if (teamId) {
             fetchTeamDetails();
             fetchTasks();
             fetchUsers();
         }
     }, [teamId, userId]);
-    
-    
+
+
 
     const fetchTeamDetails = async () => {
         try {
@@ -78,10 +81,19 @@ const Dashboard = () => {
         }
     };
 
-    const handleCompleteTask = async (taskId) => {
-        await updateTaskStatus(taskId, 'completed');
-        fetchTasks();
+    const handleCompleteTask = async (taskId, currentStatus) => {
+        if (currentStatus === 'completed') {
+            const confirm = window.confirm("❓ המשימה סומנה כבוצעה. האם להחזיר למצב המתנה?");
+            if (!confirm) return;
+
+            await updateTaskStatus(taskId, 'pending');
+        } else {
+            await updateTaskStatus(taskId, 'completed');
+        }
+
+        fetchTasks(); // רענון המשימות לאחר שינוי
     };
+
 
     const handleShowTaskDetails = (task) => {
         setSelectedTask(task);
@@ -206,16 +218,14 @@ const Dashboard = () => {
                                             {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
                                         </Badge>
 
-                                        {task.status !== 'completed' && (
-                                            <Button
-                                                variant="outline-success"
-                                                size="sm"
-                                                className="ms-2"
-                                                onClick={() => handleCompleteTask(task._id)}
-                                            >
-                                                ✔️ סמן כבוצע
-                                            </Button>
-                                        )}
+                                        <Button
+                                            variant={task.status === 'completed' ? "outline-warning" : "outline-success"}
+                                            size="sm"
+                                            className="ms-2"
+                                            onClick={() => handleCompleteTask(task._id, task.status)}
+                                        >
+                                            {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
+                                        </Button>
 
                                         {task.status === 'completed' && (
                                             <Button

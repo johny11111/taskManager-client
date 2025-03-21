@@ -1,102 +1,100 @@
-/* 🌙 התאמות למצב כהה */
+/* 🌙 התאמות למצב כהה עם סגול עמוק */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   max-height: 100dvh;
   overflow-y: hidden;
-
-
 }
 
-.dark-mode {
-  background-color: #121212;
-  color: #ffffff;
+body {
+  background-color: #ffffff; /* מצב בהיר ברירת מחדל */
+  transition: background-color 0.3s ease; /* מעבר חלק */
 }
 
-/* 🔹 ניווט עליון */
+.dark-mode body {
+  background-color: #121212 !important; /* צבע רקע כהה למצב כהה */
+}
+/* עיצוב עדין יותר ל-Navbar */
+
+.navbar-custom {
+  background-color: #ffffff !important; /* רקע לבן נקי */
+  border-bottom: 2px solid #EDE7F6; /* פס עדין סגול */
+  padding: 8px 0;
+  box-shadow: none;
+}
+
+.navbarBrand {
+  color: #6A1B9A !important; /* לוגו בצבע סגול עמוק */
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-custom .nav-link {
+  color: #6A1B9A !important; /* קישורים בצבע סגול */
+  margin: 0 10px;
+  font-weight: 500;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #4A148C !important; /* סגול כהה מעט בהובר */
+}
+
+.btn-secondary {
+  background-color: #6A1B9A !important;
+  color: #ffffff !important;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #4A148C !important;
+}
+
+.btn-outline-dark,
+.btn-outline-light {
+  border-color: #6A1B9A;
+  color: #6A1B9A !important;
+}
+
+.btn-outline-dark:hover,
+.btn-outline-light:hover {
+  background-color: #6A1B9A;
+  color: #ffffff !important;
+}
+
+/* עיצוב navbar במצב כהה - עדין יותר */
+
 .dark-mode .navbar-custom {
-  background-color: #1e1e1e !important;
-  border-bottom: 1px solid #333;
+  background-color: #2b2b2b !important; /* כהה עדין */
+  border-bottom: 2px solid #4A148C; /* פס סגול עדין */
 }
 
-.dark-mode .navbarBrand {
-  color: #f8f9fa !important;
+.dark-mode .navbarBrand,
+.dark-mode .nav-link {
+  color: #ffffff !important;
 }
 
-/* 🏷️ כפתורים */
-.dark-mode .btn-primary {
-  background-color: #820084 !important;
-  border-color: #0056b3;
-  color: #fff !important;
+.dark-mode .nav-link:hover {
+  color: #B39DDB !important;
 }
 
 .dark-mode .btn-secondary {
-  background-color: #444 !important;
-  border-color: #666;
-  color: #f1f1f1 !important;
+  background-color: #4A148C !important;
 }
 
-.dark-mode .btn-outline-light {
-  border-color: #ddd;
-  color: #fff !important;
+.dark-mode .btn-secondary:hover {
+  background-color: #6A1B9A !important;
 }
 
-.dark-mode .btn-outline-dark {
-  border-color: #ccc;
-  color: #ddd !important;
-}
-
-/* 🔳 כפתורי משימות */
-.dark-mode .btn-outline-success {
-  border-color: #28a745;
-  color: #28a745 !important;
-}
-
-.dark-mode .btn-outline-warning {
-  border-color: #ffc107;
-  color: #ffc107 !important;
-}
-
-.dark-mode .btn-outline-danger {
-  border-color: #dc3545;
-  color: #dc3545 !important;
-}
-
-/* 🏷️ כפתור הוספת משימה */
-.dark-mode .btn-primary {
-  background-color: #3c3f44
-}
-
-/* 📑 רקע המשימות */
-.dark-mode .list-group-item {
-  background-color: #1e1e1e;
-  color: #ffffff;
-  border: 1px solid #333;
-}
-
-/* ✅ באדג'ים (תגיות סטטוס משימות) */
-.dark-mode .badge-success {
-  background-color: #28a745 !important;
-}
-
-.dark-mode .badge-warning {
-  background-color: #ffc107 !important;
-  color: #333 !important;
-}
-
-.dark-mode .badge-danger {
-  background-color: #dc3545 !important;
-}
-
-/* 📜 כותרות */
+/* 📜 כותרות עם צבע סגול */
 .dark-mode h1,
 .dark-mode h2,
 .dark-mode h3,
 .dark-mode h4,
 .dark-mode h5,
 .dark-mode h6 {
-  color: #ffffff;
+  color: #B39DDB;
 }
 
 /* 🖥️ התאמות לטבלאות */
@@ -110,20 +108,7 @@
   border-color: #333;
 }
 
-
-/* 🌙 מצב כהה - כפתור "הוספת משימה" */
-.dark-mode .btn-primary {
-  background-color: #4b4c4d !important;
-  border-color: #0056b3;
-  color: #fff !important;
-}
-
-.dark-mode .btn-primary:hover {
-  background-color: #626465 !important;
-  border-color: #003d80;
-}
-
-/* 📌 טאבים (משימות שבוצעו, קרובות, היום) */
+/* 📌 טאבים עם צבע סגול */
 .dark-mode .nav-tabs {
   border-bottom: 2px solid #444;
 }
@@ -135,36 +120,25 @@
 }
 
 .dark-mode .nav-tabs .nav-link.active {
-  background-color: #7d7f7e !important;
+  background-color: #6A1B9A !important;
   color: #fff !important;
   border: 1px solid transparent;
 }
 
-/* 🏷️ כפתורי טאב בעת מעבר עכבר */
 .dark-mode .nav-tabs .nav-link:hover {
-  background-color: #333 !important;
-  color: #ddd !important;
-}
-
-/* 🏷️ כפתור טאבים לחוץ */
-.dark-mode .nav-tabs .nav-item.show .nav-link {
-  background-color: #52575c;
+  background-color: #4A148C !important;
   color: #fff !important;
 }
-
 
 /* 🌙 מצב כהה - תיקון עיצוב ה-Modal */
 .dark-mode .modal-content {
   background-color: #1e1e1e !important;
-  /* רקע כהה */
   color: #ffffff !important;
-  /* טקסט לבן */
   border: 1px solid #444;
 }
 
 .dark-mode .modal-header {
   background-color: #2b2b2b !important;
-  /* רקע כהה יותר */
   border-bottom: 1px solid #555;
 }
 
@@ -178,10 +152,8 @@
   border-top: 1px solid #555;
 }
 
-
 .dark-mode .modal-header .btn-close {
   filter: invert(1);
-  /* הופך את הצבע של ה-X ללבן */
 }
 
 /* כפתור סגירה */
@@ -213,39 +185,122 @@
 }
 
 
-
-
 /* Dashboard */
 
-.containerDashboard{
-  max-height: 100dvh;
-  overflow-y: scroll;
+/* Dashboard.css */
+
+.containerDashboard {
+  background-color: #F5F5F5; /* אפור בהיר לרקע */
+  padding: 20px;
+  border-radius: 12px;
 }
 
+h1 {
+  color: #6A1B9A; /* סגול עמוק לכותרת */
+  margin-bottom: 30px;
+}
 
+.nav-tabs .nav-link.active {
+  background-color: #6A1B9A; /* רקע סגול עמוק לטאב פעיל */
+  color: #989595 !important;
+  border-radius: 8px;
+}
+
+.nav-tabs .nav-link {
+  color: #6A1B9A;
+  font-weight: bold;
+}
+
+button.btn-primary {
+  background-color: #6A1B9A;
+  border: none;
+}
+
+button.btn-primary:hover {
+  background-color: #4A148C;
+}
+
+.ListGroup-item {
+  background-color: #FFFFFF;
+  border: 1px solid #E0E0E0;
+}
+
+.ListGroup-item:hover {
+  background-color: #F3E5F5; /* סגול בהיר מאוד להובר */
+}
+
+.badge-success {
+  background-color: #4CAF50;
+}
+
+.badge-warning {
+  background-color: #FFC107;
+}
+
+/* כפתורים */
+.btn-outline-success {
+  color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.btn-outline-warning {
+  color: #FFC107;
+  border-color: #FFC107;
+}
+
+.btn-outline-danger {
+  color: #F44336;
+  border-color: #F44336;
+}
+
+.btn-outline-success:hover, .btn-outline-warning:hover, .btn-outline-danger:hover {
+  color: #FFFFFF;
+}
+
+/* שיפור רספונסיביות למובייל */
+@media (max-width: 768px) {
+  .containerDashboard {
+      padding: 10px;
+  }
+
+  h1 {
+      font-size: 1.5rem;
+  }
+}
 
 /* login page */
 
 .containerLogin {
   display: flex;
-  background: #b48bb4;
-  padding-top: 3rem;
+  background: linear-gradient(135deg, #6A1B9A, #B39DDB);
+  padding-top: 4rem;
   direction: rtl;
-
   justify-content: center;
+  align-items: center;
   height: 100dvh;
 }
 
 .card {
   width: 90%;
-  height: max-content !important;
-  
+  max-width: 400px;
+  padding: 2rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  background-color: #ffffff;
 }
 
 .btnLogin {
-  background-color: #9b4baf !important;
+  background-color: #6A1B9A !important;
+  border: none;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
 }
 
+.btnLogin:hover {
+  background-color: #4A148C !important;
+}
 
 /* register page */
 
@@ -253,13 +308,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #b48bb4;
-  padding-top: 3rem;
+  background: linear-gradient(135deg, #6A1B9A, #B39DDB);
+  padding-top: 4rem;
   direction: rtl;
+  justify-content: center;
   height: 100dvh;
 }
 
 .btnRegister{
+  background-color: #6A1B9A !important;
+  color: #ffffff;
   width: 300px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+}
+
+.btnRegister:hover{
+  background-color: #4A148C !important;
 }
 

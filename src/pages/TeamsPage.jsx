@@ -14,7 +14,7 @@ const TeamsPage = () => {
     useEffect(() => {
         fetchTeams();
         fetchUsers();
-    }, []);
+    }, [teams]);
 
     const fetchTeams = async () => {
         const data = await getTeams();
@@ -91,7 +91,7 @@ const TeamsPage = () => {
             <ListGroup>
                 {teams.map(team => (
                     <ListGroup.Item key={team._id} onClick={() => navigate(`/dashboard/${team._id}`)} style={{ cursor: 'pointer' }}>
-                        {team.name} 🏢 ({team.members.length} חברים)
+                        {team.name} 🏢 ({team.members?.length} חברים)
                     </ListGroup.Item>
                 ))}
             </ListGroup>

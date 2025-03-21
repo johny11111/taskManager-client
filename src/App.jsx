@@ -15,6 +15,17 @@ function App() {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'enabled');
 
   useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('darkMode', 'enabled');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('darkMode', 'disabled');
+    }
+  }, [darkMode]);
+  
+
+  useEffect(() => {
     setToken(localStorage.getItem('token'))
     const storedUser = localStorage.getItem('user');
 

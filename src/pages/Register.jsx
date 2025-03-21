@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { registerUser } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
+import { Container, Form, Button, Alert , Card  } from 'react-bootstrap';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -27,29 +27,53 @@ const Register = () => {
     };
 
     return (
-        <Container className="containerRegister mt-4">
-            <h2> הרשמה</h2>
+        <Container className="containerRegister">
+        <Card className="card p-4 shadow-lg form-container">
+            <h2 className="text-center">הרשמה</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">✅ הרשמה הצליחה! מעביר לדף התחברות...</Alert>}
             <Form onSubmit={handleRegister}>
                 <Form.Group className="mb-3">
                     <Form.Label>שם מלא</Form.Label>
-                    <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <Form.Control 
+                        type="text" 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        required 
+                        className="input-dark-mode"
+                    />
                 </Form.Group>
-
+    
                 <Form.Group className="mb-3">
                     <Form.Label>אימייל</Form.Label>
-                    <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    <Form.Control 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        required 
+                        className="input-dark-mode"
+                    />
                 </Form.Group>
-
+    
                 <Form.Group className="mb-3">
                     <Form.Label>סיסמה</Form.Label>
-                    <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <Form.Control 
+                        type="password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        required 
+                        className="input-dark-mode"
+                    />
                 </Form.Group>
-
-                <Button className='btnRegister' variant="success" type="submit">הירשם</Button>
+    
+                <Button variant="primary" type="submit" className="btnRegister w-100">הירשם</Button>
             </Form>
-        </Container>
+            <p className="mt-3 text-center">
+                כבר יש לך חשבון? <Link to="/login" className="link-dark-mode">להתחברות</Link>
+            </p>
+        </Card>
+    </Container>
+    
     );
 };
 
