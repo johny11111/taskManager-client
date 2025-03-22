@@ -134,18 +134,25 @@ const Dashboard = () => {
             return;
         }
     
-        // ודא שאתה לוקח teamId נכון מהפרמטרים או מה-state
-        const teamId = '67ddf8dcf3ada2f279c39681'; // בדיקה זמנית (קח אותו מה-state או useParams)
+        // שליפת teamId מהנתונים הקיימים
+        const { teamId } = useParams(); 
+        const storedTeam = localStorage.getItem('teamId'); 
+        const finalTeamId = teamId || storedTeam;
+    
+        if (!finalTeamId) {
+            setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
+            return;
+        }
     
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/api/users/invite', {
+            const res = await fetch('https://taskmanager-client-2pyw.onrender.com/api/users/invite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ email: inviteEmail, teamId }) // ← וודא ש־teamId נשלח!
+                body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId }) 
             });
     
             const data = await res.json();
