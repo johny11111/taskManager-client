@@ -23,10 +23,10 @@ const TeamsPage = () => {
             alert("🛑 יש להזין שם לצוות!");
             return;
         }
-
+    
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('https://taskmanager-client-2pyw.onrender.com/users/create', {
+            const response = await fetch('https://taskmanager-client-2pyw.onrender.com/api/users/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,9 +34,15 @@ const TeamsPage = () => {
                 },
                 body: JSON.stringify({ name: teamName })
             });
-
-            const data = await response.json();
-
+    
+            // ✅ בדיקה אם התגובה ריקה כדי למנוע שגיאה
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Empty response from server");
+            }
+    
+            const data = JSON.parse(text);
+    
             if (response.ok) {
                 setTeams([...teams, data.team]);
                 setTeamName('');
@@ -48,6 +54,7 @@ const TeamsPage = () => {
             alert("❌ שגיאה בחיבור לשרת");
         }
     };
+    
 
     return (
         <Container className="mt-4">
