@@ -135,10 +135,8 @@ const Dashboard = () => {
             return;
         }
     
-        // שליפת teamId מהנתונים הקיימים
-        const { teamId } = useParams(); 
         const storedTeam = localStorage.getItem('teamId'); 
-        const finalTeamId = teamId || storedTeam;
+        const finalTeamId = teamId || storedTeam; // ← teamId מגיע מ-useParams למעלה
     
         if (!finalTeamId) {
             setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
@@ -147,7 +145,7 @@ const Dashboard = () => {
     
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('https://taskmanager-client-2pyw.onrender.com/api/users/invite', {
+            const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/invite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -169,6 +167,7 @@ const Dashboard = () => {
             setInviteMessage('❌ שגיאה בשליחת ההזמנה');
         }
     };
+    
     
 
 
