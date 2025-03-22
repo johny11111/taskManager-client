@@ -9,7 +9,7 @@ function InviteForm() {
     try {
       const token = localStorage.getItem('token'); 
 
-      const res = await axios.post('/api/users/invite', { email }, {
+      const res = await axios.post('https://taskmanager-client-2pyw.onrender.com/api/users/invite', { email }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
