@@ -4,7 +4,7 @@ const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
 
 export const registerUser = async ({ name, email, password, token }) => {
     try {
-        const res = await fetch('http://localhost:5000/api/users/register', {
+        const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, token })
