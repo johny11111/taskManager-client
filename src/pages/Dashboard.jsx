@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTasksByTeam, updateTaskStatus, deleteTask, getUsers, getTeamById } from '../api/tasks';
+import { getTasksByTeam, updateTaskStatus, deleteTask, getUsers, getTeamById, createTaskForTeam } from '../api/tasks';
 import TaskForm from '../components/TaskForm';
 import { Container, Row, Col, ListGroup, Badge, Button, Modal, Nav , Form } from 'react-bootstrap';
-import { useUser } from '../context/UserContext';
+
 
 const Dashboard = () => {
     const { teamId } = useParams();
-    const { user } = useUser();
     const [team, setTeam] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [users, setUsers] = useState({});
@@ -15,18 +14,41 @@ const Dashboard = () => {
     const [showModal, setShowModal] = useState(false);
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [selectedTab, setSelectedTab] = useState('today');
+    const [userId, setUserId] = useState(null);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
 
-    const userId = user?._id || user?.id;
+
 
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            setUserId(userData.id || userData._id); // תומך גם ב-id וגם ב-_id
+        } else {
+            console.warn("🚨 אין משתמש מחובר ב-LocalStorage!");
+        }
+    }, []);
+
+
+    useEffect(() => {
+        const fetchTeamDetails = async () => {
+            try {
+                const teamData = await getTeamById(teamId);
+                setTeam(teamData);
+            } catch (error) {
+                console.error("❌ שגיאה בקבלת פרטי הצוות:", error);
+            }
+        };
+
         if (teamId) {
             fetchTeamDetails();
             fetchTasks();
             fetchUsers();
         }
     }, [teamId, userId]);
+
+
 
     const fetchTeamDetails = async () => {
         try {
@@ -41,6 +63,7 @@ const Dashboard = () => {
         if (!teamId) return;
         try {
             const data = await getTasksByTeam(teamId);
+            console.log("📌 משימות מהשרת:", data); // ✅ בדוק אם המשימות באמת מתקבלות
             setTasks(data);
         } catch (error) {
             console.error('❌ שגיאה בשליפת משימות:', error);
@@ -61,17 +84,27 @@ const Dashboard = () => {
     };
 
     const handleCompleteTask = async (taskId, currentStatus) => {
-        const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
-        await updateTaskStatus(taskId, newStatus);
-        fetchTasks();
+        if (currentStatus === 'completed') {
+            const confirm = window.confirm("❓ המשימה סומנה כבוצעה. האם להחזיר למצב המתנה?");
+            if (!confirm) return;
+
+            await updateTaskStatus(taskId, 'pending');
+        } else {
+            await updateTaskStatus(taskId, 'completed');
+        }
+
+        fetchTasks(); // רענון המשימות לאחר שינוי
     };
+
 
     const handleShowTaskDetails = (task) => {
         setSelectedTask(task);
         setShowModal(true);
     };
-
-    const handleCloseModal = () => setShowModal(false);
+    const handleCloseModal = () => {
+        setSelectedTask(null);
+        setShowModal(false);
+    };
 
     const handleDeleteTask = async (taskId) => {
         const confirmDelete = window.confirm("❌ האם אתה בטוח שברצונך למחוק את המשימה?");
@@ -83,18 +116,35 @@ const Dashboard = () => {
 
     const filterTasks = () => {
         const today = new Date().toISOString().split('T')[0];
+
+        if (!userId || !teamId) return [];
+
         return tasks.filter(task => {
-            const due = task.dueDate?.split('T')[0];
-            if (selectedTab === 'today') return due === today && task.status !== 'completed';
-            if (selectedTab === 'upcoming') return due > today && task.status !== 'completed';
+            const taskDueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
+
+            if (selectedTab === 'all') return true;
+            if (selectedTab === 'today') return taskDueDate === today && task.status !== 'completed';
+            if (selectedTab === 'upcoming') return taskDueDate > today && task.status !== 'completed';
             if (selectedTab === 'completed') return task.status === 'completed';
-            return true;
         });
     };
 
     const handleSendInvite = async () => {
-        if (!inviteEmail.trim()) return setInviteMessage('🛑 נא להזין כתובת מייל');
-
+        if (!inviteEmail.trim()) {
+            setInviteMessage('🛑 נא להזין כתובת מייל');
+            return;
+        }
+    
+        // שליפת teamId מהנתונים הקיימים
+        const { teamId } = useParams(); 
+        const storedTeam = localStorage.getItem('teamId'); 
+        const finalTeamId = teamId || storedTeam;
+    
+        if (!finalTeamId) {
+            setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
+            return;
+        }
+    
         try {
             const token = localStorage.getItem('token');
             const res = await fetch('https://taskmanager-client-2pyw.onrender.com/api/users/invite', {
@@ -103,10 +153,11 @@ const Dashboard = () => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ email: inviteEmail, teamId })
+                body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId }) 
             });
-
+    
             const data = await res.json();
+    
             if (res.ok) {
                 setInviteMessage('✅ ההזמנה נשלחה בהצלחה!');
                 setInviteEmail('');
@@ -118,16 +169,31 @@ const Dashboard = () => {
             setInviteMessage('❌ שגיאה בשליחת ההזמנה');
         }
     };
+    
+
 
     return (
         <Container className="containerDashboard mt-4">
-            <h1 className="text-center">📋 ניהול משימות - {team?.name || 'טוען...'}</h1>
+            {team ? (
+                <h1 className="text-center">📋 ניהול משימות -  {team.name}</h1>
+            ) : (
+                <h1 className="text-center">📋 טוען ...</h1>
+            )}
+
+            
 
             <Nav variant="tabs" className="mb-3 justify-content-center">
                 {['today', 'upcoming', 'completed', 'all'].map(tab => (
                     <Nav.Item key={tab}>
-                        <Nav.Link active={selectedTab === tab} onClick={() => setSelectedTab(tab)}>
-                            {tab === 'today' ? '⏳ משימות להיום' : tab === 'upcoming' ? '📅 קרובות' : tab === 'completed' ? '✅ בוצעו' : '📋 כל המשימות'}
+                        <Nav.Link
+                            active={selectedTab === tab}
+                            onClick={() => setSelectedTab(tab)}
+                            className="text-center"
+                        >
+                            {tab === 'today' ? '⏳ משימות להיום' :
+                                tab === 'upcoming' ? '📅 משימות קרובות' :
+                                    tab === 'completed' ? '✅ משימות שבוצעו' :
+                                        '📋 כל המשימות'}
                         </Nav.Link>
                     </Nav.Item>
                 ))}
@@ -151,11 +217,18 @@ const Dashboard = () => {
                 </Col>
             </Row>
 
+
             <Row className="justify-content-center">
                 <Col md={8}>
-                    <Button variant="primary" className="mb-3 w-100" onClick={() => setShowTaskForm(true)}>
-                        ➕ הוסף משימה
-                    </Button>
+                    {team && (
+                        <Button
+                            variant="primary"
+                            className="mb-3 w-100"
+                            onClick={() => setShowTaskForm(true)}
+                        >
+                            ➕ הוסף משימה
+                        </Button>
+                    )}
 
                     {showTaskForm && (
                         <Modal show={showTaskForm} onHide={() => setShowTaskForm(false)} centered>
@@ -163,40 +236,77 @@ const Dashboard = () => {
                                 <Modal.Title>➕ הוסף משימה חדשה</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <TaskForm teamId={teamId} onTaskAdded={() => { fetchTasks(); setShowTaskForm(false); }} />
+                                <TaskForm
+                                    teamId={teamId} // ✅ שולח את teamId
+                                    onTaskAdded={() => {
+                                        fetchTasks();
+                                        setShowTaskForm(false);
+                                    }}
+                                />
                             </Modal.Body>
                         </Modal>
                     )}
 
                     <ListGroup className="mt-2">
-                        {filterTasks().map(task => (
-                            <ListGroup.Item key={task._id} className="d-flex justify-content-between align-items-center">
-                                <div style={{ flexGrow: 1 }}>
-                                    <span onClick={() => handleShowTaskDetails(task)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-                                        {task.title}
-                                    </span>
-                                    <small className="text-muted">📝 {users[task.createdBy] || "לא ידוע"}</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                    <Badge bg={task.status === 'completed' ? 'success' : 'warning'} className="me-2">
-                                        {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
-                                    </Badge>
-                                    <Button
-                                        variant={task.status === 'completed' ? "outline-warning" : "outline-success"}
-                                        size="sm"
-                                        className="ms-2"
-                                        onClick={() => handleCompleteTask(task._id, task.status)}
-                                    >
-                                        {task.status === 'completed' ? "↩️ החזר" : "✔️ סמן"}
-                                    </Button>
-                                    {task.status === 'completed' && (
-                                        <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDeleteTask(task._id)}>
-                                            🗑
+                        {filterTasks().map(task => {
+                            const isCreator = task.createdBy === userId;
+                            const isAssigned = task.assignedTo === userId;
+                            const creatorName = users[task.createdBy] || "לא ידוע";
+
+                            return (
+                                <ListGroup.Item
+                                    key={task._id}
+                                    className="d-flex justify-content-between align-items-center"
+                                    style={{ padding: "12px", borderRadius: "8px" }}
+                                >
+                                    <div className="d-flex flex-column" style={{ flexGrow: 1 }}>
+                                        <span
+                                            onClick={() => handleShowTaskDetails(task)}
+                                            style={{
+                                                cursor: 'pointer',
+                                                color: isCreator ? 'blue' : isAssigned ? 'green' : 'black',
+                                                fontWeight: "bold"
+                                            }}
+                                        >
+                                            {task.title}
+                                        </span>
+                                        <small className="text-muted">
+                                            📝 {creatorName} - יוצר המשימה
+                                        </small>
+                                    </div>
+
+                                    <div className="d-flex align-items-center">
+                                        <Badge
+                                            bg={task.status === 'completed' ? 'success' : 'warning'}
+                                            className="me-2"
+                                            style={{ fontSize: "0.85rem", padding: "6px 8px" }}
+                                        >
+                                            {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
+                                        </Badge>
+
+                                        <Button
+                                            variant={task.status === 'completed' ? "outline-warning" : "outline-success"}
+                                            size="sm"
+                                            className="ms-2"
+                                            onClick={() => handleCompleteTask(task._id, task.status)}
+                                        >
+                                            {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
                                         </Button>
-                                    )}
-                                </div>
-                            </ListGroup.Item>
-                        ))}
+
+                                        {task.status === 'completed' && (
+                                            <Button
+                                                variant="outline-danger"
+                                                size="sm"
+                                                className="ms-2"
+                                                onClick={() => handleDeleteTask(task._id)}
+                                            >
+                                                🗑
+                                            </Button>
+                                        )}
+                                    </div>
+                                </ListGroup.Item>
+                            );
+                        })}
                     </ListGroup>
                 </Col>
             </Row>
@@ -213,10 +323,13 @@ const Dashboard = () => {
                         <p><strong>יוצר:</strong> {users[selectedTask.createdBy] || "לא ידוע"}</p>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>סגור</Button>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            סגור
+                        </Button>
                     </Modal.Footer>
                 </Modal>
             )}
+
         </Container>
     );
 };
