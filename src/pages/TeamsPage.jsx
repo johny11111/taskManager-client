@@ -26,7 +26,7 @@ const TeamsPage = () => {
     
         try {
             const token = localStorage.getItem('token');
-            fetch('https://taskmanager-server.onrender.com/api/users/create', {
+          const response = fetch('https://taskmanager-server.onrender.com/api/users/create', {
 
                 method: 'POST',
                 headers: {
