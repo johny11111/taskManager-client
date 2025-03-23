@@ -189,11 +189,29 @@ body {
 
 /* Dashboard.css */
 
+
 .containerDashboard {
   background-color: #F5F5F5; /* אפור בהיר לרקע */
   padding: 20px;
   border-radius: 12px;
 }
+
+.selectTamp{
+  overflow: hidden;
+
+ 
+}
+
+.taskList {
+  max-height: calc(100vh - 60dvh); /* 280px ≈ כותרת + טאבים + טופס הזמנה */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  padding-bottom: 2rem;
+  scroll-behavior: smooth;
+}
+
+
 
 h1 {
   color: #6A1B9A; /* סגול עמוק לכותרת */

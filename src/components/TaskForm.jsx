@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createTaskForTeam, getUsers } from '../api/tasks';
+import { createTaskForTeam, getTeamMembers } from '../api/tasks';
 import { Form, Button, Container } from 'react-bootstrap';
 
 const TaskForm = ({ teamId, onTaskAdded }) => {
@@ -10,12 +10,14 @@ const TaskForm = ({ teamId, onTaskAdded }) => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        if (teamId) {
+            fetchUsers();
+        }
+    }, [teamId]);
 
     const fetchUsers = async () => {
         try {
-            const data = await getUsers();
+            const data = await getTeamMembers(teamId);
             setUsers(data);
         } catch (error) {
             console.error("❌ Error fetching users:", error);

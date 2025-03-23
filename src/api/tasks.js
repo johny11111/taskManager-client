@@ -37,21 +37,32 @@ export const getTasks = async () => {
 
 
 // 📌 הבאת רשימת המשתמשים
-export const getUsers = async () => {
-    try {
-        const res = await fetch(`${USERS_API_URL}/all`, { headers: getAuthHeaders() });
+// export const getUsers = async () => {
+//     try {
+//         const res = await fetch(`${USERS_API_URL}/all`, { headers: getAuthHeaders() });
 
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error(`❌ Failed to fetch users: ${res.status} - ${errorText}`);
-            throw new Error(`Failed to fetch users: ${res.status} - ${errorText}`);
-        }
-        return res.json();
-    } catch (error) {
-        console.error('❌ Error fetching users:', error);
-        throw error;
-    }
+//         if (!res.ok) {
+//             const errorText = await res.text();
+//             console.error(`❌ Failed to fetch users: ${res.status} - ${errorText}`);
+//             throw new Error(`Failed to fetch users: ${res.status} - ${errorText}`);
+//         }
+//         return res.json();
+//     } catch (error) {
+//         console.error('❌ Error fetching users:', error);
+//         throw error;
+//     }
+// };
+
+export const getTeamMembers = async (teamId) => {
+    const res = await fetch(`${USERS_API_URL}/team-members?teamId=${teamId}`, {
+        headers: getAuthHeaders()
+    });
+
+    if (!res.ok) throw new Error('שגיאה בקבלת חברי הצוות');
+
+    return res.json();
 };
+
 
 // 📌 יצירת משימה חדשה
 export const createTaskForTeam = async (teamId, taskData) => {
