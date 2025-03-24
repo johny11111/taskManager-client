@@ -9,6 +9,7 @@ import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { UserContext } from './context/UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
+import ConnectGoogleCalendar from './components/ConnectGoogleCalendar';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -78,6 +79,7 @@ function App() {
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
           <Route path="/dashboard" element={selectedTeam ? <Dashboard team={selectedTeam} /> : <Navigate to="/teams" />} />
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
+          <Route path="/google/callback" element={<ConnectGoogleCalendar />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
         </Routes>
       </Router>

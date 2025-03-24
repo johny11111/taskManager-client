@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam  } from '../api/tasks';
+import ConnectGoogleCalendar from '../components/ConnectGoogleCalendar';
+import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam } from '../api/tasks';
 import TaskForm from '../components/TaskForm';
 import { Container, Row, Col, ListGroup, Badge, Button, Modal, Nav, Form } from 'react-bootstrap';
 
@@ -10,6 +11,7 @@ const Dashboard = () => {
     const [team, setTeam] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [users, setUsers] = useState({});
+    const [user, setUser] = useState(null);
     const [selectedTask, setSelectedTask] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showTaskForm, setShowTaskForm] = useState(false);
@@ -24,7 +26,8 @@ const Dashboard = () => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             const userData = JSON.parse(storedUser);
-            setUserId(userData.id || userData._id); // תומך גם ב-id וגם ב-_id
+            setUser(userData);
+            setUserId(userData.id || userData._id); 
         } else {
             console.warn("🚨 אין משתמש מחובר ב-LocalStorage!");
         }
@@ -180,6 +183,8 @@ const Dashboard = () => {
                 ) : (
                     <h1 className="text-center">📋 טוען ...</h1>
                 )}
+
+                <ConnectGoogleCalendar  />
 
                 <Nav variant="tabs" className="mb-3 justify-content-center">
                     {['today', 'upcoming', 'completed', 'all'].map(tab => (

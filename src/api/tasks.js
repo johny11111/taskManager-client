@@ -1,7 +1,7 @@
-//const API_URL = 'http://localhost:5000/api/tasks';
-const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/tasks';
-//const USERS_API_URL = 'http://localhost:5000/api/users'; 
-const USERS_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users'; 
+const API_URL = 'http://localhost:5000/api/tasks';
+//const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/tasks';
+const USERS_API_URL = 'http://localhost:5000/api/users';
+//const USERS_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users'; 
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -173,6 +173,68 @@ export const getTasksByTeam = async (teamId) => {
     const data = await res.json();
     console.log(`📥 התקבלו ${data.length} משימות מהשרת`);
     return data;
+};
+
+export const syncOpenTasksToCalendar = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user?.googleCalendar?.access_token) {
+            return res.status(400).json({ message: 'יומן Google לא מחובר' });
+        }
+
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({
+            access_token: user.googleCalendar.access_token,
+            refresh_token: user.googleCalendar.refresh_token,
+        });
+
+        const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+        // משימות פתוחות שטרם סונכרנו
+        const tasks = await Task.find({
+            createdBy: user._id,
+            status: 'pending',
+            googleEventId: { $exists: false },
+        });
+
+        let addedCount = 0;
+
+        for (const task of tasks) {
+            if (!task.dueDate) continue;
+
+            const start = new Date(task.dueDate);
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+            try {
+                const response = await calendar.events.insert({
+                    calendarId: 'primary',
+                    requestBody: {
+                        summary: task.title,
+                        description: task.description,
+                        start: {
+                            dateTime: start.toISOString(),
+                            timeZone: 'Asia/Jerusalem',
+                        },
+                        end: {
+                            dateTime: end.toISOString(),
+                            timeZone: 'Asia/Jerusalem',
+                        },
+                    },
+                });
+
+                task.googleEventId = response.data.id;
+                await task.save();
+                addedCount++;
+            } catch (err) {
+                console.error('❌ שגיאה בהוספת אירוע:', err.message);
+            }
+        }
+
+        res.json({ addedCount });
+    } catch (err) {
+        console.error('❌ שגיאה כללית בסנכרון:', err.message);
+        res.status(500).json({ message: 'שגיאה בסנכרון ליומן', error: err.message });
+    }
 };
 
 
