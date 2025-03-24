@@ -24,7 +24,7 @@ const ConnectGoogleCalendar = () => {
         if (!token) return;
 
         try {
-          const res = await fetch("http://localhost:5000/api/users/me", {
+          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
             headers: { Authorization: `Bearer ${token}` },
           });
           const updatedUser = await res.json();
@@ -34,7 +34,7 @@ const ConnectGoogleCalendar = () => {
           // 🟡 לאחר התחברות – לשאול על סנכרון משימות פתוחות
           const shouldSync = window.confirm("התחברת בהצלחה ליומן 🎉 האם להוסיף את כל המשימות הפתוחות ליומן Google?");
           if (shouldSync) {
-            await fetch("http://localhost:5000/api/tasks/sync-google-calendar", {
+            await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -57,8 +57,8 @@ const ConnectGoogleCalendar = () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
 
-    const clientId = '1090097729918-dvlvjh943fm5l90rv9222pkgj6b3sbrn.apps.googleusercontent.com';
-    const redirectUri = 'http://localhost:5000/api/google/calendar/callback';
+    const clientId =  import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
