@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ConnectGoogleCalendar from '../components/ConnectGoogleCalendar';
-import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam } from '../api/tasks';
+import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam, updateTask } from '../api/tasks';
 import TaskForm from '../components/TaskForm';
 import { Container, Row, Col, ListGroup, Badge, Button, Modal, Nav, Form } from 'react-bootstrap';
 
@@ -19,6 +19,8 @@ const Dashboard = () => {
     const [userId, setUserId] = useState(null);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
+    const [taskToEdit, setTaskToEdit] = useState(null);
+
 
 
 
@@ -27,7 +29,7 @@ const Dashboard = () => {
         if (storedUser) {
             const userData = JSON.parse(storedUser);
             setUser(userData);
-            setUserId(userData.id || userData._id); 
+            setUserId(userData.id || userData._id);
         } else {
             console.warn("🚨 אין משתמש מחובר ב-LocalStorage!");
         }
@@ -35,14 +37,6 @@ const Dashboard = () => {
 
 
     useEffect(() => {
-        const fetchTeamDetails = async () => {
-            try {
-                const teamData = await getTeamById(teamId);
-                setTeam(teamData);
-            } catch (error) {
-                console.error("❌ שגיאה בקבלת פרטי הצוות:", error);
-            }
-        };
 
         if (teamId) {
             fetchTeamDetails();
@@ -117,6 +111,28 @@ const Dashboard = () => {
         }
     };
 
+    const handleUpdateTask = async (updatedTask) => {
+        try {
+            await updateTask(updatedTask._id, updatedTask);
+            fetchTasks();
+            setShowTaskForm(false);
+            setSelectedTask(null); // ✅ התיקון
+            setTaskToEdit(null);
+        } catch (error) {
+            console.error("❌ שגיאה בעדכון משימה:", error);
+            alert("שגיאה בעדכון המשימה");
+        }
+    };
+
+
+    const handleEditTask = (task) => {
+        setTaskToEdit(task);
+        setShowTaskForm(true);
+        handleCloseModal();
+        setSelectedTask(null);
+    };
+
+
     const filterTasks = () => {
         const today = new Date().toISOString().split('T')[0];
 
@@ -184,7 +200,7 @@ const Dashboard = () => {
                     <h1 className="text-center">📋 טוען ...</h1>
                 )}
 
-                <ConnectGoogleCalendar  />
+                <ConnectGoogleCalendar />
 
                 <Nav variant="tabs" className="mb-3 justify-content-center">
                     {['today', 'upcoming', 'completed', 'all'].map(tab => (
@@ -244,12 +260,19 @@ const Dashboard = () => {
                                 <Modal.Body>
                                     <TaskForm
                                         teamId={teamId}
+                                        taskToEdit={taskToEdit}
                                         users={Object.entries(users).map(([id, name]) => ({ _id: id, name }))}
                                         onTaskAdded={() => {
                                             fetchTasks();
                                             setShowTaskForm(false);
                                         }}
+                                        onEditComplete={() => {
+                                            fetchTasks();
+                                            setShowTaskForm(false);
+                                            setTaskToEdit(null);
+                                        }}
                                     />
+
                                 </Modal.Body>
                             </Modal>
                         )}
@@ -329,11 +352,17 @@ const Dashboard = () => {
                         <p>{selectedTask.description}</p>
                         <p><strong>תאריך יעד:</strong> {selectedTask.dueDate}</p>
                         <p><strong>יוצר:</strong> {users[selectedTask.createdBy] || "לא ידוע"}</p>
+                        <p><strong>הוקצתה ל:</strong> {users[selectedTask.assignedTo] || "לא ידוע"}</p>
+
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleCloseModal}>
                             סגור
                         </Button>
+                        <Button variant="warning" onClick={() => handleEditTask(selectedTask)}>
+                            ✏ ערוך משימה
+                        </Button>
+
                     </Modal.Footer>
                 </Modal>
             )}

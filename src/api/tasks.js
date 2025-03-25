@@ -108,6 +108,23 @@ export const updateTaskStatus = async (id, status) => {
     return res.json();
 };
 
+export const updateTask = async (taskId, updatedData) => {
+    const res = await fetch(`${API_URL}/${taskId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updatedData)
+    });
+  
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`❌ Failed to update task: ${res.status} - ${errorText}`);
+      throw new Error(`Failed to update task: ${res.status} - ${errorText}`);
+    }
+  
+    return await res.json();
+  };
+  
+
 // 📌 מחיקת משימה
 export const deleteTask = async (id) => {
     try {
