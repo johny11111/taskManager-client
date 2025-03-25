@@ -1,63 +1,71 @@
 import React, { useEffect, useState } from 'react';
-import { syncOpenTasksToCalendar } from '../api/tasks';
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  useEffect(() => {
-    const calendarConnected = new URLSearchParams(window.location.search).get("calendar_connected");
-  
-    if (calendarConnected) {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-  
-      // שליפה מהשרת
-      const fetchUser = async () => {
-        try {
-          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const updatedUser = await res.json();
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          setUser(updatedUser);
-        } catch (err) {
-          console.error("❌ שגיאה בשליפת משתמש מעודכן:", err);
-        }
-      };
-  
-      fetchUser();
-      window.history.replaceState({}, "", window.location.pathname); // מסיר את הפרמטר מה-URL
-    }
-  }, []);
-  
-
-  useEffect(() => {
-    const calendarWasAlreadyConnected = localStorage.getItem("calendar_connected");
-  
-    if (calendarWasAlreadyConnected && user?.googleCalendar?.access_token) {
-      localStorage.removeItem("calendar_connected");
-  
-      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם תרצה לסנכרן את כל המשימות הפתוחות ליומן?");
-      if (confirmSync) {
-        syncOpenTasksToCalendar()
-          .then(() => alert("✅ כל המשימות הפתוחות סונכרנו ליומן שלך"))
-          .catch((err) => {
-            console.error("❌ שגיאה בסנכרון משימות ליומן:", err);
-            alert("שגיאה בסנכרון המשימות ליומן");
-          });
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("שגיאה בפריסת המשתמש מה־localStorage:", err);
       }
     }
-  }, [user]);
-  
+  }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isCalendarConnected = urlParams.get("calendar_connected");
+
+    if (isCalendarConnected) {
+      const fetchUpdatedUser = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const updatedUser = await res.json();
+          if (!updatedUser || !updatedUser._id) {
+            console.error("❌ לא התקבל משתמש מעודכן");
+            return;
+          }
+
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+
+          const shouldSync = window.confirm("התחברת בהצלחה ליומן 🎉 האם להוסיף את כל המשימות הפתוחות ליומן Google?");
+          if (shouldSync) {
+            const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+              }
+            });
+
+            if (!syncRes.ok) {
+              const errText = await syncRes.text();
+              console.error("❌ שגיאה בסנכרון משימות ליומן:", errText);
+            } else {
+              alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
+            }
+          }
+
+          // 🧼 הסרת הפרמטר מה-URL לאחר התחברות
+          window.history.replaceState({}, '', window.location.pathname);
+
+        } catch (err) {
+          console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
+        }
+      };
+
+      fetchUpdatedUser();
+    }
+  }, []); // ⚠️ אל תוסיף את user כתלות, זה יפעיל שוב את ההוק
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
@@ -66,8 +74,6 @@ const ConnectGoogleCalendar = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
-
-    localStorage.setItem("calendar_connected", "true");
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
