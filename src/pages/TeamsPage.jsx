@@ -1,8 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
 import { getTeams } from '../api/teams';
 import { useNavigate } from 'react-router-dom';
-import { Container, ListGroup, Button, Form, Row, Col } from 'react-bootstrap';
+import { Container, ListGroup, Button, Form } from 'react-bootstrap';
 import { UserContext } from '../context/UserContext';
+import ConnectGoogleCalendar from '../components/ConnectGoogleCalendar';
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState([]);
@@ -67,7 +68,7 @@ const TeamsPage = () => {
     const data = await res.json();
     if (res.ok) {
       alert('🗑 הצוות נמחק בהצלחה');
-      setTeams(teams.filter(t => t._id !== teamId)); // ⬅️ עדכון ה־state
+      setTeams(teams.filter(t => t._id !== teamId));
     } else {
       alert(`❌ שגיאה: ${data.message}`);
     }
@@ -76,6 +77,8 @@ const TeamsPage = () => {
   return (
     <Container className="mt-4">
       <h1 className="text-center">🏢 ניהול צוותים</h1>
+
+      <ConnectGoogleCalendar />
 
       <Form onSubmit={handleCreateTeam} className="mb-3">
         <Form.Group className="mb-2">

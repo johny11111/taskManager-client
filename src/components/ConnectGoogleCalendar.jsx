@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { syncOpenTasksToCalendar } from '../api/tasks'; // ודא שזה הנתיב הנכון
+import { syncOpenTasksToCalendar } from '../api/tasks';
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
 
-  // שליפת משתמש מה-localStorage בעת טעינת הרכיב
+  // טען את המשתמש מה-localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -12,42 +12,24 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
-  // טיפול בחיבור ליומן (כולל בקשה לסנכרון)
+  // טיפול ב-return מההרשאה של Google
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isCalendarConnected = urlParams.get("calendar_connected");
-    const calendarWasAlreadyConnected = localStorage.getItem("calendar_connected");
+    const params = new URLSearchParams(window.location.search);
+    const isConnected = params.get("calendar_connected");
 
-    if (isCalendarConnected) {
-      // שמור פלג זמני ב-localStorage
+    if (isConnected) {
       localStorage.setItem("calendar_connected", "true");
+      window.history.replaceState({}, '', window.location.pathname); // מנקה את ה-URL
+    }
+  }, []);
 
-      // עדכון פרטי המשתמש במסד
-      const fetchUpdatedUser = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        try {
-          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          const updatedUser = await res.json();
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          setUser(updatedUser);
-        } catch (err) {
-          console.error("שגיאה בשליפת המשתמש המעודכן:", err);
-        }
-      };
-
-      fetchUpdatedUser();
-    } else if (calendarWasAlreadyConnected) {
-      // לאחר הניווט חזרה לאפליקציה
+  // ברגע שהיוזר נטען – אם התחבר ליומן, נשאל אם לסנכרן
+  useEffect(() => {
+    const isCalendarConnected = localStorage.getItem("calendar_connected");
+    if (isCalendarConnected && user?.googleCalendar?.access_token) {
       localStorage.removeItem("calendar_connected");
 
-      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם תרצה לסנכרן את כל המשימות הפתוחות ליומן?");
+      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם לסנכרן את כל המשימות?");
       if (confirmSync) {
         syncOpenTasksToCalendar()
           .then(() => alert("✅ כל המשימות הפתוחות סונכרנו ליומן שלך"))
@@ -57,9 +39,8 @@ const ConnectGoogleCalendar = () => {
           });
       }
     }
-  }, []);
+  }, [user]);
 
-  // התחלת תהליך OAuth מול Google
   const handleConnect = () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
