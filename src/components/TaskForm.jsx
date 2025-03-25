@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { createTaskForTeam, getTeamMembers } from '../api/tasks';
+import { createTaskForTeam, getTeamMembers, updateTask } from '../api/tasks';
 import { Form, Button, Container } from 'react-bootstrap';
 
-const TaskForm = ({ teamId, onTaskAdded }) => {
+const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
@@ -10,10 +10,17 @@ const TaskForm = ({ teamId, onTaskAdded }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    if (teamId) {
-      fetchUsers();
-    }
+    if (teamId) fetchUsers();
   }, [teamId]);
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description);
+      setAssignedTo(taskToEdit.assignedTo);
+      setDueDate(new Date(taskToEdit.dueDate).toISOString().slice(0, 16)); // עבור input datetime-local
+    }
+  }, [taskToEdit]);
 
   const fetchUsers = async () => {
     try {
@@ -32,29 +39,44 @@ const TaskForm = ({ teamId, onTaskAdded }) => {
       return;
     }
 
+    const parsed = new Date(dueDate);
+    if (isNaN(parsed)) {
+      alert("תאריך יעד לא תקין");
+      return;
+    }
+
+    const dueDateISO = parsed.toISOString();
+
     try {
-        const parsed = new Date(dueDate);
-        if (isNaN(parsed)) {
-          alert("תאריך יעד לא תקין");
-          return;
-        }
-      
-        const dueDateISO = parsed.toISOString();
-      
+      if (taskToEdit) {
+        // עדכון משימה קיימת
+        await updateTask(taskToEdit._id, {
+          title,
+          description,
+          assignedTo,
+          dueDate: dueDateISO
+        });
+        onEditComplete?.(); // עדכון רשימת משימות או סגירת טופס
+      } else {
+        // יצירת משימה חדשה
         await createTaskForTeam(teamId, {
           title,
           description,
           assignedTo,
           dueDate: dueDateISO
         });
-      
-        onTaskAdded(); 
-      } catch (error) {
-        console.error("❌ Error creating task:", error);
-        alert("שגיאה בהוספת המשימה");
+        onTaskAdded?.();
       }
-      
-      
+
+      // ניקוי שדות
+      setTitle('');
+      setDescription('');
+      setAssignedTo('');
+      setDueDate('');
+    } catch (error) {
+      console.error("❌ שגיאה בשמירת המשימה:", error);
+      alert("שגיאה בשמירה");
+    }
   };
 
   return (
@@ -106,7 +128,9 @@ const TaskForm = ({ teamId, onTaskAdded }) => {
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">➕ הוסף משימה</Button>
+        <Button variant="primary" type="submit">
+          {taskToEdit ? '💾 עדכן משימה' : '➕ הוסף משימה'}
+        </Button>
       </Form>
     </Container>
   );
