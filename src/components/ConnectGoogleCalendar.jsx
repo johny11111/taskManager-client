@@ -1,63 +1,70 @@
 import React, { useEffect, useState } from 'react';
+import { syncOpenTasksToCalendar } from '../api/tasks'; // ודא שזה הנתיב הנכון
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
 
+  // שליפת משתמש מה-localStorage בעת טעינת הרכיב
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("שגיאה בפריסת המשתמש מה־localStorage:", err);
-      }
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 
+  // טיפול בחיבור ליומן (כולל בקשה לסנכרון)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const isCalendarConnected = urlParams.get("calendar_connected");
+    const calendarWasAlreadyConnected = localStorage.getItem("calendar_connected");
 
     if (isCalendarConnected) {
+      // שמור פלג זמני ב-localStorage
+      localStorage.setItem("calendar_connected", "true");
+
+      // עדכון פרטי המשתמש במסד
       const fetchUpdatedUser = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
         try {
           const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           });
+
           const updatedUser = await res.json();
           localStorage.setItem("user", JSON.stringify(updatedUser));
           setUser(updatedUser);
-
-          // 🟡 לאחר התחברות – לשאול על סנכרון משימות פתוחות
-          const shouldSync = window.confirm("התחברת בהצלחה ליומן 🎉 האם להוסיף את כל המשימות הפתוחות ליומן Google?");
-          if (shouldSync) {
-            await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json"
-              }
-            });
-            alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
-          }
-
         } catch (err) {
-          console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
+          console.error("שגיאה בשליפת המשתמש המעודכן:", err);
         }
       };
 
       fetchUpdatedUser();
+    } else if (calendarWasAlreadyConnected) {
+      // לאחר הניווט חזרה לאפליקציה
+      localStorage.removeItem("calendar_connected");
+
+      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם תרצה לסנכרן את כל המשימות הפתוחות ליומן?");
+      if (confirmSync) {
+        syncOpenTasksToCalendar()
+          .then(() => alert("✅ כל המשימות הפתוחות סונכרנו ליומן שלך"))
+          .catch((err) => {
+            console.error("❌ שגיאה בסנכרון משימות ליומן:", err);
+            alert("שגיאה בסנכרון המשימות ליומן");
+          });
+      }
     }
   }, []);
 
+  // התחלת תהליך OAuth מול Google
   const handleConnect = () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
 
-    const clientId =  import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
 
