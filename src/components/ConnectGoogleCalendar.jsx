@@ -12,11 +12,40 @@ const ConnectGoogleCalendar = () => {
   }, []);
 
   useEffect(() => {
+    const calendarConnected = new URLSearchParams(window.location.search).get("calendar_connected");
+  
+    if (calendarConnected) {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+  
+      // שליפה מהשרת
+      const fetchUser = async () => {
+        try {
+          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const updatedUser = await res.json();
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+        } catch (err) {
+          console.error("❌ שגיאה בשליפת משתמש מעודכן:", err);
+        }
+      };
+  
+      fetchUser();
+      window.history.replaceState({}, "", window.location.pathname); // מסיר את הפרמטר מה-URL
+    }
+  }, []);
+  
+
+  useEffect(() => {
     const calendarWasAlreadyConnected = localStorage.getItem("calendar_connected");
-
-    if (calendarWasAlreadyConnected) {
+  
+    if (calendarWasAlreadyConnected && user?.googleCalendar?.access_token) {
       localStorage.removeItem("calendar_connected");
-
+  
       const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם תרצה לסנכרן את כל המשימות הפתוחות ליומן?");
       if (confirmSync) {
         syncOpenTasksToCalendar()
@@ -27,7 +56,8 @@ const ConnectGoogleCalendar = () => {
           });
       }
     }
-  }, []);
+  }, [user]);
+  
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
