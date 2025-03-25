@@ -253,7 +253,10 @@ const Dashboard = () => {
                         )}
 
                         {showTaskForm && (
-                            <Modal show={showTaskForm} onHide={() => setShowTaskForm(false)} centered>
+                           <Modal show={showTaskForm} onHide={() => {
+                            setShowTaskForm(false);
+                            setTaskToEdit(null); // ✅ כאן
+                          }} centered>
                                 <Modal.Header closeButton>
                                     <Modal.Title>➕ הוסף משימה חדשה</Modal.Title>
                                 </Modal.Header>

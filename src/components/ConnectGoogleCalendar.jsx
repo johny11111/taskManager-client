@@ -17,41 +17,53 @@ const ConnectGoogleCalendar = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const isCalendarConnected = urlParams.get("calendar_connected");
-
+  
     if (isCalendarConnected) {
       const fetchUpdatedUser = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
-
+  
         try {
           const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
             headers: { Authorization: `Bearer ${token}` },
           });
+  
           const updatedUser = await res.json();
+          if (!updatedUser || !updatedUser._id) {
+            console.error("❌ לא התקבל משתמש מעודכן");
+            return;
+          }
+  
           localStorage.setItem("user", JSON.stringify(updatedUser));
           setUser(updatedUser);
-
+  
           // 🟡 לאחר התחברות – לשאול על סנכרון משימות פתוחות
           const shouldSync = window.confirm("התחברת בהצלחה ליומן 🎉 האם להוסיף את כל המשימות הפתוחות ליומן Google?");
           if (shouldSync) {
-            await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
+            const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
               }
             });
-            alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
+  
+            if (!syncRes.ok) {
+              const errText = await syncRes.text();
+              console.error("❌ שגיאה בסנכרון משימות ליומן:", errText);
+            } else {
+              alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
+            }
           }
-
         } catch (err) {
           console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
         }
       };
-
+  
       fetchUpdatedUser();
     }
-  }, []);
+  }, [user]); // ✅ אפשר גם להוסיף את user כתלות כדי לוודא שהוא נטען קודם
+  
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
