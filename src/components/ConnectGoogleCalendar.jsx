@@ -4,7 +4,6 @@ import { syncOpenTasksToCalendar } from '../api/tasks';
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
 
-  // טען את המשתמש מה-localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -12,24 +11,13 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
-  // טיפול ב-return מההרשאה של Google
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const isConnected = params.get("calendar_connected");
+    const calendarWasAlreadyConnected = localStorage.getItem("calendar_connected");
 
-    if (isConnected) {
-      localStorage.setItem("calendar_connected", "true");
-      window.history.replaceState({}, '', window.location.pathname); // מנקה את ה-URL
-    }
-  }, []);
-
-  // ברגע שהיוזר נטען – אם התחבר ליומן, נשאל אם לסנכרן
-  useEffect(() => {
-    const isCalendarConnected = localStorage.getItem("calendar_connected");
-    if (isCalendarConnected && user?.googleCalendar?.access_token) {
+    if (calendarWasAlreadyConnected) {
       localStorage.removeItem("calendar_connected");
 
-      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם לסנכרן את כל המשימות?");
+      const confirmSync = window.confirm("📅 היומן חובר בהצלחה! האם תרצה לסנכרן את כל המשימות הפתוחות ליומן?");
       if (confirmSync) {
         syncOpenTasksToCalendar()
           .then(() => alert("✅ כל המשימות הפתוחות סונכרנו ליומן שלך"))
@@ -39,7 +27,7 @@ const ConnectGoogleCalendar = () => {
           });
       }
     }
-  }, [user]);
+  }, []);
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
@@ -49,11 +37,11 @@ const ConnectGoogleCalendar = () => {
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
 
+    localStorage.setItem("calendar_connected", "true");
+
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
-    )}&response_type=code&scope=${encodeURIComponent(
-      scope
-    )}&access_type=offline&prompt=consent&state=${userId}`;
+    )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${userId}`;
 
     window.location.href = authUrl;
   };

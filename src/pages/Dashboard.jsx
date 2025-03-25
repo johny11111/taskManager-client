@@ -184,6 +184,8 @@ const Dashboard = () => {
                     <h1 className="text-center">📋 טוען ...</h1>
                 )}
 
+                <ConnectGoogleCalendar  />
+
                 <Nav variant="tabs" className="mb-3 justify-content-center">
                     {['today', 'upcoming', 'completed', 'all'].map(tab => (
                         <Nav.Item key={tab}>
