@@ -1,0 +1,227 @@
+[33mcommit ed45e1ca0e7deab7ecafbf16c95addb11359a3ea[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Tue Mar 25 09:27:46 2025 +0200
+
+    update connect calender
+
+[33mcommit 0d1a52592ee62c6d3553e3516412838433c53d3f[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Tue Mar 25 08:45:40 2025 +0200
+
+    update redirect googleauth.js
+
+[33mcommit 43d2c99286ffb4a5aa025b50205cf102865b4372[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Tue Mar 25 08:34:39 2025 +0200
+
+    connectgooglecalander
+
+[33mcommit 5da83894a8a13e7000b4ae719ceac6e6bc851b15[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Tue Mar 25 08:01:32 2025 +0200
+
+    connectgooglecalander
+
+[33mcommit 97b40fdf52db53574f97a9938b0754b7c531b111[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Mon Mar 24 23:54:06 2025 +0200
+
+    env cliendid for calender
+
+[33mcommit 2c8c63a70b1afd90e46c484cd18e8c41ae60ab19[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Mon Mar 24 23:43:01 2025 +0200
+
+    env cliendid for calender
+
+[33mcommit 223dddc88cec9f6df7a2fac5167ad67d2008a20b[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Mon Mar 24 16:02:40 2025 +0200
+
+    add task to google cale\nder
+
+[33mcommit 65a70286e600c5c78c8919758e132ccff5c53cdb[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sun Mar 23 13:35:31 2025 +0200
+
+    add get memberteam
+
+[33mcommit 16c98a7722e6edd24d45c3d5275ef1b275e7896b[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 22:36:02 2025 +0200
+
+    add func delete team
+
+[33mcommit a41c4bfcb3d1a6a773729bea10b8fb44cbc58a10[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 22:08:45 2025 +0200
+
+    dashbord route invite
+
+[33mcommit 1f4ccb17ddce975f0d6a0f88f63bc5553e2658db[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:48:00 2025 +0200
+
+    teampage
+
+[33mcommit d5c49f779fb8284ff4241452d6daa4b5db2754c4[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:45:02 2025 +0200
+
+    teampage
+
+[33mcommit 79a7a8ea76c08f01dc0d78e1ede057953cb023be[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:33:16 2025 +0200
+
+    teampage
+
+[33mcommit 966a7a2200557cf22f0cf04feee7306b1ee61cec[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:30:06 2025 +0200
+
+    teampage
+
+[33mcommit e3869afaa2530f197db48b704efdb7e905eb21bf[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:27:15 2025 +0200
+
+    teampage
+
+[33mcommit 57bc5a1770a9b4ec6c8d29322782fd46ece949d6[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:16:39 2025 +0200
+
+    context1
+
+[33mcommit ffe439ac8abf5b38a27ce13637b1de36cce63f27[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:10:56 2025 +0200
+
+    context1
+
+[33mcommit 128ac42e2e4ca188f1f7bc59ac46730e1ecf8faf[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:09:11 2025 +0200
+
+    context1
+
+[33mcommit 29591e20e91e29acdb5ec047afef76d437b6fd6e[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:06:33 2025 +0200
+
+    context1
+
+[33mcommit 330215561c56ddd301a659c70c4de2a435df40aa[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:04:15 2025 +0200
+
+    context
+
+[33mcommit d0379710c063afb96cbbb5dcc43e37207e601ae0[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 03:02:11 2025 +0200
+
+    context
+
+[33mcommit a6b796f0e8bff5c8b609564f75ef0a82a7e128e8[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:59:00 2025 +0200
+
+    context
+
+[33mcommit f4f9dd5edcd995645eea0ffd9825e32241df29e1[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:55:41 2025 +0200
+
+    context
+
+[33mcommit 477f07d496f423629a5a351ec31be7fba5fb63ae[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:49:46 2025 +0200
+
+    context
+
+[33mcommit 3cb1f6eda01ea8bb203617f3f37dd83db08367f8[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:30:28 2025 +0200
+
+    route create
+
+[33mcommit a6d57fe7686a652272c33d974286c95773958dc1[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:26:58 2025 +0200
+
+    route create
+
+[33mcommit cee75b6d740cbdcf3a080358a784e9855aca10f1[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:19:57 2025 +0200
+
+    invite
+
+[33mcommit 71c1676866bf04aadada038121840963a7cfa24f[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:15:10 2025 +0200
+
+    route
+
+[33mcommit e2d293c5e52e68a5dc52e21d1db2f38bca2a1f6f[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 02:04:40 2025 +0200
+
+    route
+
+[33mcommit 9d7a0e46494457584f82bd60459d101694d80322[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Sat Mar 22 01:56:07 2025 +0200
+
+    register option
+
+[33mcommit 9e70cb79495ce8b427d019da917c8a2f6b4f2eb1[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 18:06:11 2025 +0200
+
+    api
+
+[33mcommit a5f3e1be654c4c47af45aa7c13b6ec337c2f38a6[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 17:45:18 2025 +0200
+
+    style
+
+[33mcommit d784811bb7973b92199494338cf102762123dc61[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 14:30:51 2025 +0200
+
+    update route create
+
+[33mcommit e8240f1e5646334eeadb2cdfeb4ac94e2010fb72[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 13:35:03 2025 +0200
+
+    update api url temspage
+
+[33mcommit b431bea438238e8efe2a6ffb334271cfcbf0cd96[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 13:26:45 2025 +0200
+
+    update api url temspage
+
+[33mcommit 3173dadcf82db29bc4ead72a0b89a2d492d92042[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 12:25:02 2025 +0200
+
+    api and style
+
+[33mcommit f8b03bcdc8efe7748c3c1e3dce7b49c3660b95d8[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 10:54:17 2025 +0200
+
+    update api url
+
+[33mcommit 0cefb326053d595f8b811fe617ab1c96831f198f[m
+Author: johny11111 <125285264+johny11111@users.noreply.github.com>
+Date:   Fri Mar 21 10:21:38 2025 +0200
+
+    first commit
