@@ -67,17 +67,23 @@ const ConnectGoogleCalendar = () => {
   const handleConnect = () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
-
+  
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
-
+  
+    const state = encodeURIComponent(JSON.stringify({
+      userId,
+      returnTo: '/teams' 
+    }));
+  
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
-    )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${userId}`;
-
+    )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${state}`;
+  
     window.location.href = authUrl;
   };
+  
 
   return (
     <div style={{ margin: '1rem 0' }}>
