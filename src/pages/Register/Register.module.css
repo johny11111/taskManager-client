@@ -1,0 +1,263 @@
+.containerRegister {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(135deg, #6A1B9A, #B39DDB);
+  width: 100dvw;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  direction: rtl;
+  min-height: 88.6dvh; /* ברירת מחדל */
+}
+
+.menuOpen {
+  min-height: calc(100dvh - 15dvh);
+}
+
+.card {
+  width: 100%;
+  max-width: 320px;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.5s ease;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.7rem;
+  color: #333;
+}
+
+.label {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.inputField {
+  padding: 0.4rem 2.5rem 0.4rem 0.5rem;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #6A1B9A;
+}
+
+.passwordField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordToggleBtn {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #6A1B9A;
+}
+
+.submitButton {
+  background-color: #6A1B9A !important;
+  border: none;
+  width: 100%;
+  padding: 0.65rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.submitButton:hover {
+  background-color: #4A148C !important;
+}
+
+.switchPage {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.switchPage a {
+  color: #6A1B9A;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.switchPage a:hover {
+  text-decoration: underline;
+}
+
+.successMessage,
+.errorMessage {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.successMessage {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.errorMessage {
+  background-color: #fdecea;
+  color: #c62828;
+}
+.containerRegister {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: linear-gradient(135deg, #6A1B9A, #B39DDB);
+    width: 100dvw;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    direction: rtl;
+    min-height: 88.6dvh; /* ברירת מחדל */
+  }
+  
+  .menuOpen {
+    min-height: calc(100dvh - 15dvh);
+  }
+  
+  .card {
+    width: 100%;
+    max-width: 320px;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease;
+    overflow-y: auto;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.7rem;
+    color: #333;
+  }
+  
+  .label {
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  
+  .inputField {
+    padding: 0.4rem 2.5rem 0.4rem 0.5rem;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 0.25rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .inputField:focus {
+    outline: none;
+    border-color: #6A1B9A;
+  }
+  
+  .passwordField {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .passwordToggleBtn {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #6A1B9A;
+  }
+  
+  .submitButton {
+    background-color: #6A1B9A !important;
+    border: none;
+    width: 100%;
+    padding: 0.65rem;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+  }
+  
+  .submitButton:hover {
+    background-color: #4A148C !important;
+  }
+  
+  .switchPage {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .switchPage a {
+    color: #6A1B9A;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .switchPage a:hover {
+    text-decoration: underline;
+  }
+  
+  .successMessage,
+  .errorMessage {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .successMessage {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .errorMessage {
+    background-color: #fdecea;
+    color: #c62828;
+  }
+  

@@ -1,16 +1,16 @@
 // 📁 App.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Login from './pages/Login';
-import Register from './pages/Register';
+import Register from './pages/Register/Register';
 import TeamsPage from './pages/TeamsPage';
 import Dashboard from './pages/Dashboard';
-import { Navbar, Nav, Container, Button, Spinner } from 'react-bootstrap';
 import { UserContext } from './context/UserContext';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-
+import styles from './App.module.css';
 import { logoutUser, getMe } from './api/auth';
+
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,6 +18,16 @@ function App() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'enabled');
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
+  }, [menuOpen]);
 
   useEffect(() => {
     if (darkMode) {
@@ -56,12 +66,11 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await logoutUser(); // מחיקת העוגייה בשרת
+      await logoutUser();
     } catch (err) {
       console.error('Logout failed:', err);
     }
 
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     setToken(null);
@@ -70,9 +79,9 @@ function App() {
 
   if (loading) {
     return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" role="status" />
-        <p className="mt-3">טוען משתמש...</p>
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p className={styles.loadingText}>טוען משתמש...</p>
       </div>
     );
   }
@@ -80,43 +89,60 @@ function App() {
   return (
     <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam }}>
       <Router>
-        <Navbar expand="lg" className={`navbar-custom ${darkMode ? 'navbar-dark' : 'navbar-light'}`}>
-          <Container>
-            <Navbar.Brand as={Link} to="/">Task Manager</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse>
-              <Nav className="ms-auto">
-                {!user ? (
-                  <>
-                    <Nav.Link as={Link} to="/login">🔑 התחברות</Nav.Link>
-                    <Nav.Link as={Link} to="/register">📝 הרשמה</Nav.Link>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="secondary" className="w-100 my-2" onClick={() => setDarkMode(!darkMode)}>
-                      {darkMode ? '☀️ מצב בהיר' : '🌙 מצב כהה'}
-                    </Button>
-                    <Button variant={darkMode ? 'outline-light' : 'outline-dark'} className="w-100 my-2" onClick={handleLogout}>
-                      🚪 התנתק
-                    </Button>
-                  </>
-                )}
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+        <header className={`navbar-custom ${darkMode ? styles.navbarDark : styles.navbarLight}`}>
+          <div className={styles.container}>
+            <Link to="/" className={styles.brand}>Task Manager</Link>
+            <button className={styles.hamburger} onClick={() => setMenuOpen(prev => !prev)}>
+              ☰
+            </button>
+
+            <nav className={`${styles.nav} ${menuOpen ? styles.open : ''}`}>
+              {!user ? (
+                <>
+                  <Link to="/login" className={styles.navLink} onClick={() => setMenuOpen(false)}>🔑 התחברות</Link>
+                  <Link to="/register" className={styles.navLink} onClick={() => setMenuOpen(false)}>📝 הרשמה</Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    className={`${styles.button} ${styles.fullWidth}`}
+                    onClick={() => {
+                      setDarkMode(!darkMode);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    {darkMode ? '☀️ מצב בהיר' : '🌙 מצב כהה'}
+                  </button>
+                  <button
+                    className={`${styles.button} ${styles.outlineButton} ${styles.fullWidth} ${styles.logOutBtn}`}
+                    onClick={() => {
+                      handleLogout();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    🚪 התנתק
+                  </button>
+                </>
+              )}
+            </nav>
+
+          </div>
+        </header>
 
         <Routes>
-          <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={<Login setUser={setUser} headerHeight={headerHeight} />}
+          />
+          <Route path="/register"  element={<Register headerHeight={headerHeight} />} />
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
-  
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
         </Routes>
       </Router>
     </UserContext.Provider>
   );
+
 }
 
 export default App;
