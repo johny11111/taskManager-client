@@ -5,20 +5,19 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import TeamsPage from './pages/TeamsPage';
 import Dashboard from './pages/Dashboard';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Button, Spinner } from 'react-bootstrap';
 import { UserContext } from './context/UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-import ConnectGoogleCalendar from './components/ConnectGoogleCalendar';
 
-import { logoutUser } from './api/auth';
-
+import { logoutUser, getMe } from './api/auth';
 
 function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'enabled');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (darkMode) {
@@ -32,10 +31,26 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
+    if (storedUser) {
       setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+      setLoading(false);
+    } else {
+      // נסה להביא מהשרת (אם יש עוגייה)
+      const fetchUser = async () => {
+        try {
+          const res = await getMe(); // מחזיר את המשתמש לפי העוגייה
+          if (res?._id) {
+            setUser(res);
+            localStorage.setItem('user', JSON.stringify(res));
+          }
+        } catch (err) {
+          console.warn('❌ לא אותר משתמש מהשרת');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchUser();
     }
   }, []);
 
@@ -53,6 +68,14 @@ function App() {
     setSelectedTeam(null);
   };
 
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" role="status" />
+        <p className="mt-3">טוען משתמש...</p>
+      </div>
+    );
+  }
 
   return (
     <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam }}>
@@ -87,9 +110,8 @@ function App() {
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
-          <Route path="/dashboard" element={selectedTeam ? <Dashboard team={selectedTeam} /> : <Navigate to="/teams" />} />
+  
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
-          <Route path="/google/callback" element={<ConnectGoogleCalendar />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
         </Routes>
       </Router>
