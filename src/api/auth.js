@@ -40,6 +40,20 @@ export const logoutUser = async () => {
     return res.json();
 };
 
+// 📌 הבאת המשתמש המחובר לפי העוגייה
+export const getMe = async () => {
+    const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/me', {
+      credentials: 'include', // שולח את העוגייה עם הבקשה
+    });
+  
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`❌ שגיאה בשליפת המשתמש: ${res.status} - ${text}`);
+    }
+  
+    return res.json();
+  };
+  
 
 // export const getAllUsers = async () => {
 //     const token = localStorage.getItem('token'); // או מאיפה שאתה שומר את ה-JWT
