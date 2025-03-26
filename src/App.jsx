@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
-import TeamsPage from './pages/TeamsPage';
+import TeamsPage from './pages/TeamsPage/TeamsPage';
 import Dashboard from './pages/Dashboard';
 import { UserContext } from './context/UserContext';
 import './index.css';
@@ -87,7 +87,7 @@ function App() {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam }}>
+    <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam , darkMode }}>
       <Router>
         <header className={`navbar-custom ${darkMode ? styles.navbarDark : styles.navbarLight}`}>
           <div className={styles.container}>

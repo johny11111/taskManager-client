@@ -1,13 +1,14 @@
 import { useEffect, useState, useContext } from 'react';
-import { getTeams } from '../api/teams';
+import { getTeams } from '../../api/teams';
 import { useNavigate } from 'react-router-dom';
-import { Container, ListGroup, Button, Form, Row, Col } from 'react-bootstrap';
-import { UserContext } from '../context/UserContext';
+import styles from "./TeamsPage.module.css";
+import { UserContext } from '../../context/UserContext';
+
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState([]);
   const [teamName, setTeamName] = useState('');
-  const { user } = useContext(UserContext);
+  const { user , darkMode } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,44 +75,47 @@ const TeamsPage = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <h1 className="text-center">🏢 ניהול צוותים</h1>
-
-      <Form onSubmit={handleCreateTeam} className="mb-3">
-        <Form.Group className="mb-2">
-          <Form.Label>שם הצוות</Form.Label>
-          <Form.Control
-            type="text"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            required
-          />
-        </Form.Group>
-
-        <Button type="submit" variant="primary">➕ צור צוות</Button>
-      </Form>
-
-      <h3 className="mt-4">📋 הצוותים שלי</h3>
-      <ListGroup>
+    <div className={`${styles.container} ${darkMode ? styles.dark : ''}`}>
+      <h1 className={styles.title}>🏢 ניהול צוותים</h1>
+  
+      <form onSubmit={handleCreateTeam} className={styles.form}>
+        <label htmlFor="teamName">שם הצוות</label>
+        <input
+          id="teamName"
+          type="text"
+          value={teamName}
+          onChange={(e) => setTeamName(e.target.value)}
+          className={styles.input}
+          required
+        />
+        <button type="submit" className={styles.createBtn}>➕ צור צוות</button>
+      </form>
+  
+      <h3 className={styles.subTitle}>📋 הצוותים שלי</h3>
+      <ul className={styles.teamList}>
         {teams.map(team => (
-          <ListGroup.Item key={team._id} className="d-flex justify-content-between align-items-center">
-            <div
-              style={{ cursor: 'pointer' }}
+          <li key={team._id} className={styles.teamItem}>
+            <span
               onClick={() => navigate(`/dashboard/${team._id}`)}
+              className={styles.teamName}
             >
               {team.name} 🏢 ({team.members?.length} חברים)
-            </div>
-
+            </span>
+  
             {team.createdBy === user?.id && (
-              <Button variant="danger" size="sm" onClick={() => deleteTeam(team._id)}>
-                🗑 מחק
-              </Button>
+              <button
+                onClick={() => deleteTeam(team._id)}
+                className={styles.deleteBtn}
+              >
+                🗑
+              </button>
             )}
-          </ListGroup.Item>
+          </li>
         ))}
-      </ListGroup>
-    </Container>
+      </ul>
+    </div>
   );
+  
 };
 
 export default TeamsPage;

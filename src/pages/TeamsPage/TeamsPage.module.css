@@ -1,0 +1,145 @@
+.container {
+    padding: 2rem 1rem;
+    direction: rtl;
+    min-height: calc(100dvh - 11.4dvh);
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    color: #333;
+    box-sizing: border-box;
+}
+
+.dark {
+    background: linear-gradient(135deg, #1e1e2f, #2e2e48);
+    color: #fff;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.subTitle {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* טופס יצירת צוות */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.input {
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #6A1B9A;
+}
+
+.createBtn {
+    background-color: #6A1B9A;
+    color: #fff;
+    padding: 0.65rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.createBtn:hover {
+    background-color: #4A148C;
+}
+
+/* רשימת צוותים */
+.teamList {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 600px;
+    max-height: 50dvh;
+    /* גובה מקסימלי */
+    overflow-y: auto;
+    /* גלילה אנכית */
+    scrollbar-width: thin;
+    scrollbar-color: #6A1B9A transparent;
+    /* עבור Firefox */
+}
+
+.teamList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.teamList::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 4px;
+}
+
+.teamItem {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.3s;
+}
+
+.teamItem:hover {
+    background-color: #f0f0f0;
+}
+
+.dark .teamItem {
+    background-color: #2e2e48;
+}
+
+.teamName {
+    font-weight: 500;
+}
+
+.deleteBtn {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #f44336;
+    cursor: pointer;
+}
+
+.deleteBtn:hover {
+    color: #d32f2f;
+}
+
+/* רספונסיביות */
+@media (max-width: 600px) {
+    .form {
+        width: 100%;
+    }
+
+    .input,
+    .createBtn {
+        width: 100%;
+    }
+
+    .teamItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .teamName {
+        font-size: 1rem;
+    }
+}
