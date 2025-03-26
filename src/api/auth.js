@@ -20,33 +20,44 @@ export const loginUser = async (userData) => {
     const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ⬅️ חובה בשביל לקבל את ה-cookie
         body: JSON.stringify(userData)
     });
-    
-    if (!res.ok) {
-        throw new Error('Login failed');
-    }
-
-    return res.json(); // מחזיר { token, user }
-};
-
-export const getAllUsers = async () => {
-    const token = localStorage.getItem('token'); // או מאיפה שאתה שומר את ה-JWT
-    if (!token) {
-        throw new Error('No token found');
-    }
-
-    const res = await fetch('http://localhost:5000/api/users', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
 
     if (!res.ok) {
-        throw new Error(`Failed to fetch users: ${res.status}`);
+        const error = await res.json();
+        throw new Error(error.message || 'Login failed');
     }
 
     return res.json();
 };
+
+export const logoutUser = async () => {
+    const res = await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include' 
+    });
+    return res.json();
+};
+
+
+// export const getAllUsers = async () => {
+//     const token = localStorage.getItem('token'); // או מאיפה שאתה שומר את ה-JWT
+//     if (!token) {
+//         throw new Error('No token found');
+//     }
+
+//     const res = await fetch('http://localhost:5000/api/users', {
+//         method: 'GET',
+//         headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'Content-Type': 'application/json'
+//         }
+//     });
+
+//     if (!res.ok) {
+//         throw new Error(`Failed to fetch users: ${res.status}`);
+//     }
+
+//     return res.json();
+// };

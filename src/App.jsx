@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import TeamsPage from './pages/TeamsPage'; 
+import TeamsPage from './pages/TeamsPage';
 import Dashboard from './pages/Dashboard';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { UserContext } from './context/UserContext';
@@ -11,6 +11,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import ConnectGoogleCalendar from './components/ConnectGoogleCalendar';
 import CalendarRedirect from './components/CalendarRedirect';
+import { logoutUser } from './api/auth';
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -37,13 +39,20 @@ function App() {
     }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // מחיקת העוגייה בשרת
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
   };
+
 
   return (
     <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam }}>

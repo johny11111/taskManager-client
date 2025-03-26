@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState , useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import ConnectGoogleCalendar from '../components/ConnectGoogleCalendar';
 import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam, updateTask } from '../api/tasks';
@@ -20,8 +20,6 @@ const Dashboard = () => {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
     const [taskToEdit, setTaskToEdit] = useState(null);
-
-
 
 
     useEffect(() => {
@@ -60,7 +58,6 @@ const Dashboard = () => {
         if (!teamId) return;
         try {
             const data = await getTasksByTeam(teamId);
-            console.log("📌 משימות מהשרת:", data); // ✅ בדוק אם המשימות באמת מתקבלות
             setTasks(data);
         } catch (error) {
             console.error('❌ שגיאה בשליפת משימות:', error);
@@ -69,7 +66,7 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const data = await getTeamMembers(teamId); // 👈 שליפת חברי הצוות בלבד
+            const data = await getTeamMembers(teamId); 
             const usersMap = data.reduce((map, user) => {
                 map[user._id] = user.name;
                 return map;
@@ -111,20 +108,6 @@ const Dashboard = () => {
         }
     };
 
-    const handleUpdateTask = async (updatedTask) => {
-        try {
-            await updateTask(updatedTask._id, updatedTask);
-            fetchTasks();
-            setShowTaskForm(false);
-            setSelectedTask(null); // ✅ התיקון
-            setTaskToEdit(null);
-        } catch (error) {
-            console.error("❌ שגיאה בעדכון משימה:", error);
-            alert("שגיאה בעדכון המשימה");
-        }
-    };
-
-
     const handleEditTask = (task) => {
         setTaskToEdit(task);
         setShowTaskForm(true);
@@ -132,60 +115,60 @@ const Dashboard = () => {
         setSelectedTask(null);
     };
 
-
-    const filterTasks = () => {
+    const filteredTasks = useMemo(() => {
         const today = new Date().toISOString().split('T')[0];
-
+    
         if (!userId || !teamId) return [];
-
+    
         return tasks.filter(task => {
             const taskDueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
-
+    
             if (selectedTab === 'all') return true;
             if (selectedTab === 'today') return taskDueDate === today && task.status !== 'completed';
             if (selectedTab === 'upcoming') return taskDueDate > today && task.status !== 'completed';
             if (selectedTab === 'completed') return task.status === 'completed';
         });
-    };
+    }, [tasks, selectedTab, teamId, userId]);
+    
 
     const handleSendInvite = async () => {
         if (!inviteEmail.trim()) {
-            setInviteMessage('🛑 נא להזין כתובת מייל');
-            return;
+          setInviteMessage('🛑 נא להזין כתובת מייל');
+          return;
         }
-
+      
         const storedTeam = localStorage.getItem('teamId');
-        const finalTeamId = teamId || storedTeam; // ← teamId מגיע מ-useParams למעלה
-
+        const finalTeamId = teamId || storedTeam;
+      
         if (!finalTeamId) {
-            setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
-            return;
+          setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
+          return;
         }
-
+      
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/invite', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId })
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setInviteMessage('✅ ההזמנה נשלחה בהצלחה!');
-                setInviteEmail('');
-            } else {
-                setInviteMessage(`❌ שגיאה: ${data.message}`);
-            }
+          const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/invite', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include', // ✅ שולח את ה-cookie עם ה־JWT
+            body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId })
+          });
+      
+          const data = await res.json();
+      
+          if (res.ok) {
+            setInviteMessage('✅ ההזמנה נשלחה בהצלחה!');
+            setInviteEmail('');
+          } else {
+            setInviteMessage(`❌ שגיאה: ${data.message}`);
+          }
         } catch (err) {
-            console.error('❌ שגיאה בשליחת ההזמנה:', err);
-            setInviteMessage('❌ שגיאה בשליחת ההזמנה');
+          console.error('❌ שגיאה בשליחת ההזמנה:', err);
+          setInviteMessage('❌ שגיאה בשליחת ההזמנה');
         }
-    };
+      };
+      
 
 
 
@@ -281,7 +264,7 @@ const Dashboard = () => {
                         )}
 
                         <ListGroup className="mt-2">
-                            {filterTasks().map(task => {
+                            {filteredTasks.map(task => {
                                 const isCreator = task.createdBy === userId;
                                 const isAssigned = task.assignedTo === userId;
                                 const creatorName = users[task.createdBy] || "לא ידוע";

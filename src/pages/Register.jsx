@@ -43,29 +43,31 @@ const Register = () => {
                 <Form onSubmit={handleRegister}>
                     <Form.Group className="mb-3">
                         <Form.Label>שם מלא</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
-                            required 
+                        <Form.Control
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>אימייל</Form.Label>
-                        <Form.Control 
-                            type="email" 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            required 
+                        <Form.Control
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            autoComplete="username"
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>סיסמה</Form.Label>
-                        <Form.Control 
-                            type="password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
+                        <Form.Control
+                            type="password"
+                            autoComplete="new-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </Form.Group>
                     <Button variant="primary" type="submit" className="w-100">הירשם</Button>

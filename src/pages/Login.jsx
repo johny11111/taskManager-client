@@ -17,15 +17,14 @@ const Login = ({ setUser }) => {
         try {
             const data = await loginUser({ email, password });
 
-            if (data.token) {
-                localStorage.setItem('token', data.token); // 📌 שמירת הטוקן
-                localStorage.setItem('user', JSON.stringify(data.user)); // 📌 שמירת המשתמש
-                
-                setUser(data.user); // 📌 עדכון הסטייט הגלובלי של המשתמש
-                navigate('/dashboard'); // 📌 מעבר לדשבורד אחרי התחברות
+            if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user)); // אין יותר token
+                setUser(data.user);
+                navigate('/dashboard');
             } else {
                 setError(data.message || 'Login failed');
             }
+
         } catch (err) {
             setError('Error connecting to server');
         }
@@ -39,23 +38,25 @@ const Login = ({ setUser }) => {
                 <Form onSubmit={handleLogin}>
                     <Form.Group className="mb-3">
                         <Form.Label>אימייל</Form.Label>
-                        <Form.Control 
-                            type="email" 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            required 
+                        <Form.Control
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                             className="input-dark-mode"
+                            autoComplete="username"
                         />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>סיסמה</Form.Label>
-                        <Form.Control 
-                            type="password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
+                        <Form.Control
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                             className="input-dark-mode"
+                            autoComplete="current-password"
                         />
                     </Form.Group>
 

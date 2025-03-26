@@ -194,17 +194,17 @@ body {
   background-color: #F5F5F5; /* אפור בהיר לרקע */
   padding: 20px;
   border-radius: 12px;
-  height: calc(100% *2);
 }
 
 .selectTamp{
   overflow: hidden;
+  max-height: calc(100vh - 40dvh);
 
  
 }
 
 .taskList {
-  max-height: calc(100vh - 60dvh); /* 280px ≈ כותרת + טאבים + טופס הזמנה */
+  max-height: calc(100vh - 40dvh); /* 280px ≈ כותרת + טאבים + טופס הזמנה */
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 8px;
@@ -215,12 +215,12 @@ body {
 
 
 h1 {
-  color: #6A1B9A; /* סגול עמוק לכותרת */
+  color: #6A1B9A; 
   margin-bottom: 30px;
 }
 
 .nav-tabs .nav-link.active {
-  background-color: #6A1B9A; /* רקע סגול עמוק לטאב פעיל */
+  background-color: #6A1B9A;
   color: #989595 !important;
   border-radius: 8px;
 }
@@ -245,7 +245,7 @@ button.btn-primary:hover {
 }
 
 .ListGroup-item:hover {
-  background-color: #F3E5F5; /* סגול בהיר מאוד להובר */
+  background-color: #F3E5F5; 
 }
 
 .badge-success {
