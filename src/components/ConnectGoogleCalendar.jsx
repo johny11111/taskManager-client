@@ -20,12 +20,9 @@ const ConnectGoogleCalendar = () => {
 
     if (isCalendarConnected) {
       const fetchUpdatedUser = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
         try {
           const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include' // ✅ טוקן מגיע מעוגייה
           });
 
           const updatedUser = await res.json();
@@ -37,12 +34,12 @@ const ConnectGoogleCalendar = () => {
           localStorage.setItem("user", JSON.stringify(updatedUser));
           setUser(updatedUser);
 
-          const shouldSync = window.confirm("התחברת בהצלחה ליומן 🎉 האם להוסיף את כל המשימות הפתוחות ליומן Google?");
+          const shouldSync = window.confirm("🎉 התחברת ליומן בהצלחה! רוצה להוסיף את המשימות הפתוחות ליומן Google?");
           if (shouldSync) {
             const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
               method: "POST",
+              credentials: 'include', // ✅ גם כאן
               headers: {
-                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
               }
             });
@@ -55,8 +52,8 @@ const ConnectGoogleCalendar = () => {
             }
           }
 
-          // 🧼 הסרת הפרמטר מה-URL לאחר התחברות
-          window.history.replaceState({}, '', window.location.pathname);
+          // 🧼 הסרת הפרמטר מה-URL
+          window.history.replaceState({}, '', window.location.pathname + window.location.hash);
 
         } catch (err) {
           console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
@@ -65,7 +62,7 @@ const ConnectGoogleCalendar = () => {
 
       fetchUpdatedUser();
     }
-  }, []); // ⚠️ אל תוסיף את user כתלות, זה יפעיל שוב את ההוק
+  }, []);
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
