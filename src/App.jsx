@@ -10,7 +10,7 @@ import { UserContext } from './context/UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import ConnectGoogleCalendar from './components/ConnectGoogleCalendar';
-import CalendarRedirect from './components/CalendarRedirect';
+
 import { logoutUser } from './api/auth';
 
 
@@ -90,7 +90,6 @@ function App() {
           <Route path="/dashboard" element={selectedTeam ? <Dashboard team={selectedTeam} /> : <Navigate to="/teams" />} />
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
           <Route path="/google/callback" element={<ConnectGoogleCalendar />} />
-          <Route path="/calendar-redirect" element={<CalendarRedirect />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
         </Routes>
       </Router>
