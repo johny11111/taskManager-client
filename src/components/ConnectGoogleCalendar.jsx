@@ -17,52 +17,55 @@ const ConnectGoogleCalendar = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const isCalendarConnected = urlParams.get("calendar_connected");
-
-    if (isCalendarConnected) {
-      const fetchUpdatedUser = async () => {
-        try {
-          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
-            credentials: 'include' // ✅ טוקן מגיע מעוגייה
-          });
-
-          const updatedUser = await res.json();
-          if (!updatedUser || !updatedUser._id) {
-            console.error("❌ לא התקבל משתמש מעודכן");
-            return;
-          }
-
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          setUser(updatedUser);
-
-          const shouldSync = window.confirm("🎉 התחברת ליומן בהצלחה! רוצה להוסיף את המשימות הפתוחות ליומן Google?");
-          if (shouldSync) {
-            const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
-              method: "POST",
-              credentials: 'include', // ✅ גם כאן
-              headers: {
-                "Content-Type": "application/json"
-              }
-            });
-
-            if (!syncRes.ok) {
-              const errText = await syncRes.text();
-              console.error("❌ שגיאה בסנכרון משימות ליומן:", errText);
-            } else {
-              alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
-            }
-          }
-
-          // 🧼 הסרת הפרמטר מה-URL
-          window.history.replaceState({}, '', window.location.pathname + window.location.hash);
-
-        } catch (err) {
-          console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
+  
+    const fetchUpdatedUser = async () => {
+      try {
+        const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
+          credentials: 'include'
+        });
+  
+        const updatedUser = await res.json();
+        if (!updatedUser || !updatedUser._id) {
+          console.error("❌ לא התקבל משתמש מעודכן");
+          return;
         }
-      };
-
+  
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
+  
+        const shouldSync = window.confirm("🎉 התחברת ליומן בהצלחה! רוצה להוסיף את המשימות הפתוחות ליומן Google?");
+        if (shouldSync) {
+          const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+  
+          if (!syncRes.ok) {
+            const errText = await syncRes.text();
+            console.error("❌ שגיאה בסנכרון משימות ליומן:", errText);
+          } else {
+            alert("✨ כל המשימות הפתוחות נוספו ליומן שלך");
+          }
+        }
+  
+        // 🧼 הסרת הפרמטר מה-URL
+        const hash = window.location.hash; // שומר את ה-hash (/teams)
+        window.history.replaceState({}, '', window.location.pathname + hash);
+  
+      } catch (err) {
+        console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
+      }
+    };
+  
+    // תמיד ננסה למשוך את המשתמש אם העוגייה קיימת
+    if (isCalendarConnected || !localStorage.getItem("user")) {
       fetchUpdatedUser();
     }
   }, []);
+  
 
   const handleConnect = () => {
     const userId = user?._id || user?.id;
