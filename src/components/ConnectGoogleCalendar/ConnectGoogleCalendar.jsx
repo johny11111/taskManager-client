@@ -23,7 +23,7 @@ const ConnectGoogleCalendar = () => {
   
     const fetchUpdatedUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/users/me", {
+        const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
           credentials: 'include'
         });
   
@@ -38,7 +38,7 @@ const ConnectGoogleCalendar = () => {
   
         const shouldSync = window.confirm("🎉 התחברת ליומן בהצלחה! רוצה להוסיף את המשימות הפתוחות ליומן Google?");
         if (shouldSync) {
-          const syncRes = await fetch("http://localhost:5000/api/tasks/sync-google-calendar", {
+          const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -75,7 +75,7 @@ const ConnectGoogleCalendar = () => {
     if (!userId) return alert("משתמש לא נמצא");
   
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = 'http://localhost:5000/api/google/calendar/callback';
+    const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
   
     const state = encodeURIComponent(JSON.stringify({

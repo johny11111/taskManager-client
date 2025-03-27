@@ -1,5 +1,5 @@
-//const TEAM_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users/teams';
-const TEAM_API_URL = 'http://localhost:5000/api/users/teams';
+const TEAM_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users/teams';
+//const TEAM_API_URL = 'http://localhost:5000/api/users/teams';
 
 /** 📌 יצירת צוות חדש */
 export const createTeam = async (teamData) => {

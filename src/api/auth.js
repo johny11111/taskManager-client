@@ -1,5 +1,5 @@
-//const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
+//const API_URL = 'http://localhost:5000/api/users';
 
 
 export const registerUser = async ({ name, email, password, token }) => {
@@ -54,24 +54,3 @@ export const getMe = async () => {
     return res.json();
   };
   
-
-// export const getAllUsers = async () => {
-//     const token = localStorage.getItem('token'); // או מאיפה שאתה שומר את ה-JWT
-//     if (!token) {
-//         throw new Error('No token found');
-//     }
-
-//     const res = await fetch('http://localhost:5000/api/users', {
-//         method: 'GET',
-//         headers: {
-//             'Authorization': `Bearer ${token}`,
-//             'Content-Type': 'application/json'
-//         }
-//     });
-
-//     if (!res.ok) {
-//         throw new Error(`Failed to fetch users: ${res.status}`);
-//     }
-
-//     return res.json();
-// };
