@@ -2,10 +2,48 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
     
 }
 
-html, body {
-    height: 100dvh;
-    overflow: hidden; /* מונע גלילה */
+body, html, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
   }
+  
+  body.dark {
+  background-color: #1e1e2f;
+  color: #fff;
+}
+
+:root {
+    --bg-main: #fdfbff;
+    --bg-card: #ffffff;
+    --bg-taskItem: #ffffff;
+    --text-color: #212529;
+    --title-color: #4A148C;
+    --primary: #6A1B9A;
+    --primary-dark: #4A148C;
+    --accent: #7b5387;
+    --accent-hover: #694496;
+    --delete: #f44336;
+    --delete-hover: #c62828;
+    --scrollbar: #6A1B9A;
+  }
+  
+  [data-theme="dark"] {
+    --bg-main: #121212;
+    --bg-card: #2e2e48;
+    --bg-taskItem: #3b3b5c;
+    --text-color: #ffffff;
+    --title-color: #ffffff;
+    --primary: #8e24aa;
+    --primary-dark: #6A1B9A;
+    --accent: #8e44ad;
+    --accent-hover: #6a1b9a;
+    --delete: #f44336;
+    --delete-hover: #c62828;
+    --scrollbar: #8e24aa;
+  }
+  

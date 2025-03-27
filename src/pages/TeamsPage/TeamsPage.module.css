@@ -68,12 +68,9 @@
     margin: 0 auto;
     max-width: 600px;
     max-height: 50dvh;
-    /* גובה מקסימלי */
     overflow-y: auto;
-    /* גלילה אנכית */
     scrollbar-width: thin;
     scrollbar-color: #6A1B9A transparent;
-    /* עבור Firefox */
 }
 
 .teamList::-webkit-scrollbar {

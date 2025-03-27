@@ -4,7 +4,7 @@ import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-route
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import TeamsPage from './pages/TeamsPage/TeamsPage';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import { UserContext } from './context/UserContext';
 import './index.css';
 import styles from './App.module.css';
@@ -75,6 +75,7 @@ function App() {
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
+    Navigate("/login")
   };
 
   if (loading) {

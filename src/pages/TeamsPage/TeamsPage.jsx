@@ -33,8 +33,9 @@ const TeamsPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer`
         },
+        credentials: 'include',
         body: JSON.stringify({ name: teamName })
       });
 
@@ -59,10 +60,14 @@ const TeamsPage = () => {
     const confirmDelete = window.confirm("❗ האם אתה בטוח שברצונך למחוק את הצוות?");
     if (!confirmDelete) return;
 
-    const token = localStorage.getItem('token');
+  
     const res = await fetch(`https://taskmanager-server-ygfb.onrender.com/api/users/teams/${teamId}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { 
+         'Content-Type': 'application/json'
+       },
+       credentials: 'include',
+       
     });
 
     const data = await res.json();
