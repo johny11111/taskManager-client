@@ -1,0 +1,85 @@
+.taskForm {
+    background-color: var(--bg-card);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .formGroup label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+  }
+  
+  .formGroup input,
+  .formGroup textarea,
+  .formGroup select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    outline: none;
+    background-color: white;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  
+  .formGroup input:focus,
+  .formGroup textarea:focus,
+  .formGroup select:focus {
+    border-color: var(--primary);
+  }
+  
+  /* מצב כהה */
+  .dark .taskForm {
+    background-color: #2e2e48;
+  }
+  
+  .dark .formGroup label {
+    color: #fff;
+  }
+  
+  .dark .formGroup input,
+  .dark .formGroup textarea,
+  .dark .formGroup select {
+    background-color: #3b3b5c;
+    color: white;
+    border: 1px solid #555;
+  }
+  
+  .dark .formGroup input:focus,
+  .dark .formGroup textarea:focus,
+  .dark .formGroup select:focus {
+    border-color: var(--primary);
+  }
+  
+  .submitButton {
+    align-self: flex-start;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .submitButton:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  

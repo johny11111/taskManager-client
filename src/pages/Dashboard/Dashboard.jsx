@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import ConnectGoogleCalendar from '../../components/ConnectGoogleCalendar';
+import ConnectGoogleCalendar from '../../components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam, updateTask } from '../../api/tasks';
-import TaskForm from '../../components/TaskForm';
+import TaskForm from '../../components/TaskForm/TaskForm';
 import styles from "./Dashboard.module.css";
 import { UserContext } from '../../context/UserContext';
 
@@ -204,8 +204,6 @@ const Dashboard = () => {
             </div>
 
             <div className={`${styles.selectTamp} ${hideHeader ? styles.hidden : ''}`}>
-                <ConnectGoogleCalendar />
-
                 <div className={styles.filterButtons}>
                     {['today', 'upcoming', 'completed', 'all'].map(tab => (
                         <button

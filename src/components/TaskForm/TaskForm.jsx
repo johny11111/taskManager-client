@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { createTaskForTeam, getTeamMembers, updateTask } from '../api/tasks';
-import { Form, Button, Container } from 'react-bootstrap';
+import { createTaskForTeam, getTeamMembers, updateTask } from '../../api/tasks';
+import styles from "./TaskForm.module.css";
 
 const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
   const [title, setTitle] = useState('');
@@ -80,59 +80,54 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
   };
 
   return (
-    <Container>
-      <Form onSubmit={handleSubmit} className="p-3 border rounded shadow-sm bg-light">
-        <Form.Group className="mb-3">
-          <Form.Label>כותרת המשימה</Form.Label>
-          <Form.Control
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </Form.Group>
+    <form className={styles.taskForm} onSubmit={handleSubmit}>
+      <div className={styles.formGroup}>
+        <label>כותרת המשימה</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+      </div>
 
-        <Form.Group className="mb-3">
-          <Form.Label>תיאור</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={2}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </Form.Group>
+      <div className={styles.formGroup}>
+        <label>תיאור</label>
+        <textarea
+          rows="2"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </div>
 
-        <Form.Group className="mb-3">
-          <Form.Label>הקצה למשתמש:</Form.Label>
-          <Form.Select
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-            required
-          >
-            <option value="">בחר משתמש</option>
-            {users.map(user => (
-              <option key={user._id} value={user._id}>
-                {user.name}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+      <div className={styles.formGroup}>
+        <label>הקצה למשתמש</label>
+        <select
+          value={assignedTo}
+          onChange={(e) => setAssignedTo(e.target.value)}
+          required
+        >
+          <option value="">בחר משתמש</option>
+          {users.map(user => (
+            <option key={user._id} value={user._id}>{user.name}</option>
+          ))}
+        </select>
+      </div>
 
-        <Form.Group className="mb-3">
-          <Form.Label>תאריך יעד (כולל שעה)</Form.Label>
-          <Form.Control
-            type="datetime-local"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            required
-          />
-        </Form.Group>
+      <div className={styles.formGroup}>
+        <label>תאריך יעד (כולל שעה)</label>
+        <input
+          type="datetime-local"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          required
+        />
+      </div>
 
-        <Button variant="primary" type="submit">
-          {taskToEdit ? '💾 עדכן משימה' : '➕ הוסף משימה'}
-        </Button>
-      </Form>
-    </Container>
+      <button type="submit" className={styles.submitButton}>
+        {taskToEdit ? '💾 עדכן משימה' : '➕ הוסף משימה'}
+      </button>
+    </form>
   );
 };
 

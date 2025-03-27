@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import {AiOutlineCalendar} from "react-icons/ai"
+import styles from './ConnectGoogleCalendar.module.css';
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
+  const isConnected = user?.googleCalendar?.access_token;
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -20,7 +23,7 @@ const ConnectGoogleCalendar = () => {
   
     const fetchUpdatedUser = async () => {
       try {
-        const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
+        const res = await fetch("http://localhost:5000/api/users/me", {
           credentials: 'include'
         });
   
@@ -35,7 +38,7 @@ const ConnectGoogleCalendar = () => {
   
         const shouldSync = window.confirm("🎉 התחברת ליומן בהצלחה! רוצה להוסיף את המשימות הפתוחות ליומן Google?");
         if (shouldSync) {
-          const syncRes = await fetch("https://taskmanager-server-ygfb.onrender.com/api/tasks/sync-google-calendar", {
+          const syncRes = await fetch("http://localhost:5000/api/tasks/sync-google-calendar", {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -72,7 +75,7 @@ const ConnectGoogleCalendar = () => {
     if (!userId) return alert("משתמש לא נמצא");
   
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
+    const redirectUri = 'http://localhost:5000/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
   
     const state = encodeURIComponent(JSON.stringify({
@@ -89,16 +92,20 @@ const ConnectGoogleCalendar = () => {
   
 
   return (
-    <div style={{ margin: '1rem 0' }}>
-      {!user?.googleCalendar?.access_token ? (
-        <button onClick={handleConnect}>
-          📅 חבר את היומן שלי ל-Google Calendar
-        </button>
-      ) : (
-        <p>✔ היומן שלך כבר מחובר</p>
-      )}
+    <div className={styles.floatingWrapper}>
+      <button
+        className={styles.floatingButton}
+        onClick={handleConnect}
+        disabled={isConnected}
+      >
+        <AiOutlineCalendar size={20} />
+        <span className={styles.tooltip}>
+          {isConnected ? 'היומן מחובר' : 'התחבר ליומן Google'}
+        </span>
+      </button>
     </div>
   );
+  
 };
 
 export default ConnectGoogleCalendar;

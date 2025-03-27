@@ -1,0 +1,58 @@
+.floatingWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-start: 1rem;
+  }
+  
+  /* הכפתור עצמו */
+  .floatingButton {
+    position: relative;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .floatingButton:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+  
+  .floatingButton:disabled {
+    background-color: #4caf50;
+    cursor: default;
+    transform: none;
+  }
+  
+  /* טול־טיפ שמופיע במעבר */
+  .tooltip {
+    position: absolute;
+    top: -2.5rem;
+    right: 50%;
+    transform: translateX(50%);
+    background-color: #333;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+  
+  .floatingButton:hover .tooltip {
+    opacity: 1;
+  }
+  

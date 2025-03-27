@@ -1,8 +1,9 @@
 // 📁 App.jsx
 import { useState, useEffect, useRef } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
+import ConnectGoogleCalendar from './components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import TeamsPage from './pages/TeamsPage/TeamsPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import { UserContext } from './context/UserContext';
@@ -21,6 +22,8 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
+  // const navigate = useNavigate()
+
 
 
   useEffect(() => {
@@ -41,11 +44,16 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
+    if(!storedUser){
+      // Navigate('/login')
+      console.log("no user stored");
+      
+    }
     if (storedUser) {
       setUser(JSON.parse(storedUser));
       setLoading(false);
     } else {
-      // נסה להביא מהשרת (אם יש עוגייה)
+     
       const fetchUser = async () => {
         try {
           const res = await getMe(); // מחזיר את המשתמש לפי העוגייה
@@ -67,6 +75,7 @@ function App() {
   const handleLogout = async () => {
     try {
       await logoutUser();
+      navigate("/login")
     } catch (err) {
       console.error('Logout failed:', err);
     }
@@ -75,7 +84,7 @@ function App() {
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
-    Navigate("/login")
+   
   };
 
   if (loading) {
@@ -92,6 +101,10 @@ function App() {
       <Router>
         <header className={`navbar-custom ${darkMode ? styles.navbarDark : styles.navbarLight}`}>
           <div className={styles.container}>
+            {
+              user &&  <ConnectGoogleCalendar />
+            }
+         
             <Link to="/" className={styles.brand}>Task Manager</Link>
             <button className={styles.hamburger} onClick={() => setMenuOpen(prev => !prev)}>
               ☰
