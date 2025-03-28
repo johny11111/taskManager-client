@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {AiOutlineCalendar} from "react-icons/ai"
 import styles from './ConnectGoogleCalendar.module.css';
+import { Browser } from '@capacitor/browser';
+
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
@@ -70,7 +72,8 @@ const ConnectGoogleCalendar = () => {
   }, []);
   
 
-  const handleConnect = () => {
+
+  const handleConnect = async () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
   
@@ -81,15 +84,17 @@ const ConnectGoogleCalendar = () => {
     const state = encodeURIComponent(JSON.stringify({
       userId,
       returnTo: '/teams',
-      platform: /Capacitor/i.test(navigator.userAgent) ? 'app' : 'web'
+      platform: 'app'  // 💡 אל תנסה לזהות - קבוע כשאתה ב־Capacitor
     }));
   
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${state}`;
   
-    window.location.href = authUrl;
+    // 👇 פותח את Google Login בתוך In-App Browser
+    await Browser.open({ url: authUrl });
   };
+  
   
 
   return (
