@@ -148,6 +148,7 @@ function App() {
             path="/login"
             element={<Login setUser={setUser} headerHeight={headerHeight} />}
           />
+          <Route path="/oauth2callback" element={<OAuth2Callback />} />
           <Route path="/register"  element={<Register headerHeight={headerHeight} />} />
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
