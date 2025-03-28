@@ -10,6 +10,7 @@ import { UserContext } from './context/UserContext';
 import './index.css';
 import styles from './App.module.css';
 import { logoutUser, getMe } from './api/auth';
+import OAuth2Callback from './pages/OAuth2Callback'
 
 
 
