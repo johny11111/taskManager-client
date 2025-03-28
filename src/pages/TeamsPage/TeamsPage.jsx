@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { getTeams } from '../../api/teams';
+import { getTeams , createTeam } from '../../api/teams';
 import { useNavigate } from 'react-router-dom';
 import styles from "./TeamsPage.module.css";
 import { UserContext } from '../../context/UserContext';
@@ -20,39 +20,20 @@ const TeamsPage = () => {
     setTeams(data);
   };
 
+
   const handleCreateTeam = async (e) => {
     e.preventDefault();
     if (!teamName.trim()) {
       alert("🛑 יש להזין שם לצוות!");
       return;
     }
-
+  
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer`
-        },
-        credentials: 'include',
-        body: JSON.stringify({ name: teamName })
-      });
-
-      const text = await response.text();
-      if (!text) throw new Error("Empty response from server");
-
-      const data = JSON.parse(text);
-
-      if (response.ok) {
-        setTeams(prev => [...prev, data.team]);
-        setTeamName('');
-      } else {
-        alert(`🚨 שגיאה: ${data.message}`);
-      }
+      const data = await createTeam({ name: teamName });
+      setTeams(prev => [...prev, data.team]);
+      setTeamName('');
     } catch (error) {
-      console.error("❌ Error creating team:", error);
-      alert("❌ שגיאה בחיבור לשרת");
+      alert("❌ שגיאה ביצירת צוות");
     }
   };
 
