@@ -80,7 +80,8 @@ const ConnectGoogleCalendar = () => {
   
     const state = encodeURIComponent(JSON.stringify({
       userId,
-      returnTo: '/teams' 
+      returnTo: '/teams',
+      platform: /Capacitor/i.test(navigator.userAgent) ? 'app' : 'web'
     }));
   
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(

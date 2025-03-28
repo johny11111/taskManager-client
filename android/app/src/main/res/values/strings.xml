@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">task-manager-client</string>
+    <string name="title_activity_main">task-manager-client</string>
+    <string name="package_name">com.yonatan.taskapp</string>
+    <string name="custom_url_scheme">com.yonatan.taskapp</string>
+</resources>
