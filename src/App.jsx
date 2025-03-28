@@ -45,48 +45,50 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if(!storedUser){
-      // Navigate('/login')
-      console.log("no user stored");
-      
-    }
+  
     if (storedUser) {
       setUser(JSON.parse(storedUser));
       setLoading(false);
     } else {
-     
       const fetchUser = async () => {
         try {
-          const res = await getMe(); // מחזיר את המשתמש לפי העוגייה
+          const res = await getMe(); // בדיקת עוגייה מהשרת
           if (res?._id) {
             setUser(res);
             localStorage.setItem('user', JSON.stringify(res));
+          } else {
+            throw new Error('No valid user');
           }
         } catch (err) {
           console.warn('❌ לא אותר משתמש מהשרת');
+          setUser(null);
+          localStorage.removeItem('user');
+          window.location.href = "/#/login"; // 🔁 כאן הניווט האוטומטי
         } finally {
           setLoading(false);
         }
       };
-
+  
       fetchUser();
     }
   }, []);
-
+  
   const handleLogout = async () => {
     try {
       await logoutUser();
-      navigate("/login")
     } catch (err) {
       console.error('Logout failed:', err);
     }
-
+  
     localStorage.removeItem('user');
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
-   
+  
+    // 🔁 הפניה ברורה ללוגין
+    window.location.href = '/#/login';
   };
+  
 
   if (loading) {
     return (
