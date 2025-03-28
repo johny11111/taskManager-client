@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {AiOutlineCalendar} from "react-icons/ai"
 import styles from './ConnectGoogleCalendar.module.css';
+import { Browser } from '@capacitor/browser';
+
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
@@ -70,7 +72,7 @@ const ConnectGoogleCalendar = () => {
   }, []);
   
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     const userId = user?._id || user?.id;
     if (!userId) return alert("משתמש לא נמצא");
   
@@ -78,18 +80,25 @@ const ConnectGoogleCalendar = () => {
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
   
+    const isCapacitorApp = /Capacitor/i.test(navigator.userAgent);
+  
     const state = encodeURIComponent(JSON.stringify({
       userId,
       returnTo: '/teams',
-      platform: /Capacitor/i.test(navigator.userAgent) ? 'app' : 'web'
+      platform: isCapacitorApp ? 'app' : 'web'
     }));
   
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${state}`;
   
-    window.location.href = authUrl;
+    if (isCapacitorApp) {
+      await Browser.open({ url: authUrl }); // באפליקציה → In-App Browser
+    } else {
+      window.location.href = authUrl; // בדפדפן רגיל
+    }
   };
+  
   
 
   return (
