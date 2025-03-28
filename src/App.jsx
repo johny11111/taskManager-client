@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import ConnectGoogleCalendar from './components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import TeamsPage from './pages/TeamsPage/TeamsPage';
-import Dashboard from './pages/Dashboard/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard'; 
 import { UserContext } from './context/UserContext';
 import './index.css';
 import styles from './App.module.css';
@@ -23,7 +23,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  // const navigate = useNavigate()
+
 
 
 
