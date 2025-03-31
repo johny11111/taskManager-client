@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineCalendar } from "react-icons/ai"
+import { AiOutlineCalendar } from "react-icons/ai";
 import styles from './ConnectGoogleCalendar.module.css';
 import { Browser } from '@capacitor/browser';
-
+import { App as CapacitorApp } from '@capacitor/app';
 
 const ConnectGoogleCalendar = () => {
   const [user, setUser] = useState(null);
@@ -19,6 +19,7 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
+  // 📦 עובד רק בדפדפן רגיל (SPA עם hash)
   useEffect(() => {
     const hash = window.location.hash;
     const queryString = hash.split('?')[1] || '';
@@ -58,10 +59,9 @@ const ConnectGoogleCalendar = () => {
           }
         }
 
-        // ניקוי ה־hash
+        // ניקוי כתובת
         const hashOnly = window.location.hash.split('?')[0];
         window.history.replaceState({}, '', window.location.pathname + hashOnly);
-
       } catch (err) {
         console.error("❌ שגיאה בשליפת המשתמש המעודכן:", err);
       }
@@ -72,6 +72,34 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
+  // 📱 עובד רק באפליקציה (Deep Link)
+  useEffect(() => {
+    CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
+      console.log("📲 appUrlOpen:", url);
+
+      if (url.includes('calendar_connected=true')) {
+        await Browser.close();
+
+        try {
+          const res = await fetch("https://taskmanager-server-ygfb.onrender.com/api/users/me", {
+            credentials: 'include'
+          });
+
+          const updatedUser = await res.json();
+          console.log("🔄 משתמש מעודכן:", updatedUser);
+          if (updatedUser?._id) {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            alert("🎉 התחברת ליומן בהצלחה!");
+          }
+        } catch (err) {
+          console.error("❌ שגיאה בשליפת המשתמש:", err);
+        }
+
+        window.location.href = '/#/teams';
+      }
+    });
+  }, []);
 
   const handleConnect = async () => {
     const userId = user?._id || user?.id;
@@ -81,26 +109,21 @@ const ConnectGoogleCalendar = () => {
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
 
-    const isCapacitorApp = /Capacitor/i.test(navigator.userAgent);
-
     const state = encodeURIComponent(JSON.stringify({
       userId,
       returnTo: '/teams',
-      platform: isCapacitorApp ? 'app' : 'web'
+      platform: 'app'
     }));
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${state}`;
 
-    if (isCapacitorApp) {
-      await Browser.open({ url: authUrl }); // באפליקציה → In-App Browser
-    } else {
-      window.location.href = authUrl; // בדפדפן רגיל
-    }
+    await Browser.open({
+      url: authUrl,
+      windowName: "_system" // פותח בדפדפן
+    });
   };
-
-
 
   return (
     <div className={styles.floatingWrapper}>
@@ -116,7 +139,6 @@ const ConnectGoogleCalendar = () => {
       </button>
     </div>
   );
-
 };
 
 export default ConnectGoogleCalendar;
