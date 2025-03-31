@@ -1,17 +1,23 @@
 import { useEffect } from 'react';
+import { Browser } from '@capacitor/browser';
 
 const OAuth2Callback = () => {
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    // תומך גם ב־hash וגם ב־search
+    const fullQuery = window.location.search || window.location.hash.split('?')[1] || '';
+    const urlParams = new URLSearchParams(fullQuery);
+
     const platform = urlParams.get("platform");
     const isCalendarConnected = urlParams.get("calendar_connected");
 
+    const redirectTo = `/#/teams${isCalendarConnected ? '?calendar_connected=true' : ''}`;
+
     if (platform === 'app') {
-      // 👇 מפנה חזרה לאפליקציה
-      window.location.href = 'capacitor://localhost';
+      Browser.close()
+        .then(() => window.location.href = redirectTo)
+        .catch(() => window.location.href = redirectTo);
     } else {
-      // 👇 הפניה חזרה לאתר עם פרמטר
-      window.location.href = `/#/teams${isCalendarConnected ? '?calendar_connected=true' : ''}`;
+      window.location.href = redirectTo;
     }
   }, []);
 

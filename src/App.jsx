@@ -5,12 +5,14 @@ import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import ConnectGoogleCalendar from './components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import TeamsPage from './pages/TeamsPage/TeamsPage';
-import Dashboard from './pages/Dashboard/Dashboard'; 
+import Dashboard from './pages/Dashboard/Dashboard';
 import { UserContext } from './context/UserContext';
 import './index.css';
 import styles from './App.module.css';
 import { logoutUser, getMe } from './api/auth';
 import OAuth2Callback from './pages/OAuth2Callback'
+import { App as CapacitorApp } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 
 
 
@@ -25,7 +27,17 @@ function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
 
 
+  useEffect(() => {
+    CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('/oauth2callback')) {
+        const urlObj = new URL(url);
+        const isCalendarConnected = urlObj.searchParams.get('calendar_connected');
 
+        await Browser.close(); // סגירת הדפדפן
+        window.location.href = `/#/teams${isCalendarConnected ? '?calendar_connected=true' : ''}`;
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (headerRef.current) {
@@ -45,7 +57,7 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-  
+
     if (storedUser) {
       setUser(JSON.parse(storedUser));
       setLoading(false);
@@ -68,27 +80,27 @@ function App() {
           setLoading(false);
         }
       };
-  
+
       fetchUser();
     }
   }, []);
-  
+
   const handleLogout = async () => {
     try {
       await logoutUser();
     } catch (err) {
       console.error('Logout failed:', err);
     }
-  
+
     localStorage.removeItem('user');
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
-  
+
     // 🔁 הפניה ברורה ללוגין
     window.location.href = '/#/login';
   };
-  
+
 
   if (loading) {
     return (
@@ -100,14 +112,14 @@ function App() {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam , darkMode }}>
+    <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam, darkMode }}>
       <Router>
         <header className={`navbar-custom ${darkMode ? styles.navbarDark : styles.navbarLight}`}>
           <div className={styles.container}>
             {
-              user &&  <ConnectGoogleCalendar />
+              user && <ConnectGoogleCalendar />
             }
-         
+
             <Link to="/" className={styles.brand}>Task Manager</Link>
             <button className={styles.hamburger} onClick={() => setMenuOpen(prev => !prev)}>
               ☰
@@ -152,7 +164,7 @@ function App() {
             element={<Login setUser={setUser} headerHeight={headerHeight} />}
           />
           <Route path="/oauth2callback" element={<OAuth2Callback />} />
-          <Route path="/register"  element={<Register headerHeight={headerHeight} />} />
+          <Route path="/register" element={<Register headerHeight={headerHeight} />} />
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
