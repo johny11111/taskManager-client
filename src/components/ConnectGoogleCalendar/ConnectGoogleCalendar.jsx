@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlineCalendar } from "react-icons/ai";
 import styles from './ConnectGoogleCalendar.module.css';
 import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
 
 const ConnectGoogleCalendar = () => {
@@ -19,7 +20,7 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
-  // 📦 עובד רק בדפדפן רגיל (SPA עם hash)
+  // 📦 בדפדפן רגיל
   useEffect(() => {
     const hash = window.location.hash;
     const queryString = hash.split('?')[1] || '';
@@ -59,7 +60,6 @@ const ConnectGoogleCalendar = () => {
           }
         }
 
-        // ניקוי כתובת
         const hashOnly = window.location.hash.split('?')[0];
         window.history.replaceState({}, '', window.location.pathname + hashOnly);
       } catch (err) {
@@ -72,7 +72,7 @@ const ConnectGoogleCalendar = () => {
     }
   }, []);
 
-  // 📱 עובד רק באפליקציה (Deep Link)
+  // 📱 באפליקציה – מאזין להפניה חזרה
   useEffect(() => {
     CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
       console.log("📲 appUrlOpen:", url);
@@ -86,7 +86,6 @@ const ConnectGoogleCalendar = () => {
           });
 
           const updatedUser = await res.json();
-          console.log("🔄 משתמש מעודכן:", updatedUser);
           if (updatedUser?._id) {
             localStorage.setItem("user", JSON.stringify(updatedUser));
             setUser(updatedUser);
@@ -109,10 +108,12 @@ const ConnectGoogleCalendar = () => {
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
 
+    const isApp = Capacitor.isNativePlatform();
+
     const state = encodeURIComponent(JSON.stringify({
       userId,
       returnTo: '/teams',
-      platform: 'app'
+      platform: isApp ? 'app' : 'web'
     }));
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
@@ -121,7 +122,7 @@ const ConnectGoogleCalendar = () => {
 
     await Browser.open({
       url: authUrl,
-      windowName: "_system" // פותח בדפדפן
+      windowName: "_system"
     });
   };
 
