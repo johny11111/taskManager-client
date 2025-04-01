@@ -288,27 +288,103 @@ Container
 
 /* Modal */
 .modalWrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  direction: rtl;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
 .modalContent {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    position: relative;
+  background-color: var(--bg-card);
+  color: var(--text-color);
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+  font-family: 'Varela Round', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
+
+.closeModal {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  border-radius: 50%;
+  padding: 0.4rem;
+}
+
+.closeModal:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--primary);
+}
+
+.label {
+  font-weight: bold;
+  color: var(--primary);
+  margin-inline-end: 0.3rem;
+}
+
+.editTask {
+  align-self: flex-start;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(106, 27, 154, 0.2);
+}
+
+.editTask:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* מצב כהה */
+.dark .modalContent {
+  background-color: #2a2a40;
+  color: white;
+}
+
+.dark .closeModal {
+  color: #ccc;
+}
+
+.dark .closeModal:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #9d7ee0;
+}
+
+.dark .editTask {
+  background-color: var(--primary);
+}
+
+.dark .editTask:hover {
+  background-color: #9d7ee0;
+  color: #000;
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {

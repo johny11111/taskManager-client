@@ -1,85 +1,165 @@
 .taskForm {
-    background-color: var(--bg-card);
-    padding: 2rem;
+  padding: 2.5rem;
+  direction: rtl;
+  border-radius: 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Varela Round', sans-serif;
+  position: relative;
+  animation: fadeIn 0.25s ease-out forwards;
+  background-color: white;
+  color: var(--text-color);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  background-color: white;
+  color: var(--text-color);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  outline: none;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  border-color: var(--primary);
+}
+
+.submitButton {
+  align-self: flex-start;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(106, 27, 154, 0.2);
+}
+
+.submitButton:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.closeModal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  border-radius: 50%;
+  padding: 0.3rem 0.6rem;
+  z-index: 10;
+}
+
+.closeModal:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+}
+
+/* מצב כהה לפי class */
+.darkForm {
+background: transparent;
+  color: white;
+ 
+}
+
+.darkForm .formGroup label {
+  color: #fff;
+}
+
+.darkForm .formGroup input,
+.darkForm .formGroup textarea,
+.darkForm .formGroup select {
+  background-color: #3b3b5c !important;
+  color: white !important;
+  border: 1px solid #555 !important;
+}
+
+.darkForm .formGroup input:focus,
+.darkForm .formGroup textarea:focus,
+.darkForm .formGroup select:focus {
+  border-color: var(--primary);
+}
+
+.darkForm .submitButton {
+  background-color: var(--primary);
+}
+
+.darkForm .submitButton:hover {
+  background-color: #9d7ee0;
+  color: #000;
+}
+
+.darkForm .closeModal {
+  color: #ccc;
+}
+
+.darkForm .closeModal:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #9d7ee0;
+}
+
+
+@media (max-width: 480px) {
+  .taskForm {
+    padding: 1.5rem;
     border-radius: 1rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    transition: background-color 0.3s ease;
+    width: 95%;
+    max-width: 100%;
+    gap: 1rem;
   }
-  
-  .formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  
-  .formGroup label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text-color);
-  }
-  
+
   .formGroup input,
   .formGroup textarea,
   .formGroup select {
-    padding: 0.75rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 0.75rem;
-    font-size: 1rem;
-    outline: none;
-    background-color: white;
-    color: var(--text-color);
-    transition: border-color 0.2s ease, background-color 0.2s ease;
+    font-size: 0.95rem;
+    padding: 0.6rem 0.9rem;
   }
-  
-  .formGroup input:focus,
-  .formGroup textarea:focus,
-  .formGroup select:focus {
-    border-color: var(--primary);
-  }
-  
-  /* מצב כהה */
-  .dark .taskForm {
-    background-color: #2e2e48;
-  }
-  
-  .dark .formGroup label {
-    color: #fff;
-  }
-  
-  .dark .formGroup input,
-  .dark .formGroup textarea,
-  .dark .formGroup select {
-    background-color: #3b3b5c;
-    color: white;
-    border: 1px solid #555;
-  }
-  
-  .dark .formGroup input:focus,
-  .dark .formGroup textarea:focus,
-  .dark .formGroup select:focus {
-    border-color: var(--primary);
-  }
-  
+
   .submitButton {
-    align-self: flex-start;
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 999px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 0.95rem;
+    padding: 0.65rem 1.2rem;
   }
-  
-  .submitButton:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-2px);
-  }
-  
+}
+
+

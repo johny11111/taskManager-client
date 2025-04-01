@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import ConnectGoogleCalendar from '../../components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamById, createTaskForTeam, updateTask } from '../../api/tasks';
 import TaskForm from '../../components/TaskForm/TaskForm';
 import styles from "./Dashboard.module.css";
@@ -20,18 +19,16 @@ const Dashboard = () => {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
     const [taskToEdit, setTaskToEdit] = useState(null);
-
     const { darkMode } = useContext(UserContext);
-
     const [hideHeader, setHideHeader] = useState(false);
     const lastScrollY = useRef(0);
 
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > lastScrollY.current && window.scrollY > 100) {
-                setHideHeader(true); // גלילה למטה
+                setHideHeader(true); 
             } else {
-                setHideHeader(false); // גלילה למעלה
+                setHideHeader(false); 
             }
             lastScrollY.current = window.scrollY;
         };
@@ -40,11 +37,9 @@ const Dashboard = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-
     useEffect(() => {
         document.body.classList.toggle('dark', darkMode);
     }, [darkMode]);
-
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -57,7 +52,6 @@ const Dashboard = () => {
         }
     }, []);
 
-
     useEffect(() => {
 
         if (teamId) {
@@ -66,8 +60,6 @@ const Dashboard = () => {
             fetchUsers();
         }
     }, [teamId, userId]);
-
-
 
     const fetchTeamDetails = async () => {
         try {
@@ -114,7 +106,6 @@ const Dashboard = () => {
         fetchTasks(); // רענון המשימות לאחר שינוי
     };
 
-
     const handleShowTaskDetails = (task) => {
         setSelectedTask(task);
         setShowModal(true);
@@ -154,7 +145,6 @@ const Dashboard = () => {
         });
     }, [tasks, selectedTab, teamId, userId]);
 
-
     const handleSendInvite = async () => {
         if (!inviteEmail.trim()) {
             setInviteMessage('🛑 נא להזין כתובת מייל');
@@ -193,7 +183,16 @@ const Dashboard = () => {
         }
     };
 
-
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
         <div className={`${styles.dashboardContainer} ${darkMode ? styles.dark : ''} `} >
@@ -248,6 +247,7 @@ const Dashboard = () => {
                             <TaskForm
                                 teamId={teamId}
                                 taskToEdit={taskToEdit}
+                                isDarkMode={darkMode}
                                 users={Object.entries(users).map(([id, name]) => ({ _id: id, name }))}
                                 onTaskAdded={() => {
                                     fetchTasks();
@@ -259,6 +259,7 @@ const Dashboard = () => {
                                     setTaskToEdit(null);
                                 }}
                             />
+
                         </div>
                     </div>
                 )}
@@ -309,21 +310,24 @@ const Dashboard = () => {
             {selectedTask && (
                 <div className={styles.modalWrapper}>
                     <div className={styles.modalContent}>
-                        <button className={styles.closeModal} onClick={handleCloseModal}>X</button>
+                        <button className={styles.closeModal} onClick={handleCloseModal}>✖</button>
+
                         <h3>📝 פרטי המשימה</h3>
-                        <p><strong>{selectedTask.title}</strong></p>
+                        <p className={styles.title}><strong>{selectedTask.title}</strong></p>
                         <p>{selectedTask.description}</p>
-                        <p><strong>תאריך יעד:</strong> {selectedTask.dueDate}</p>
-                        <p><strong>יוצר:</strong> {users[selectedTask.createdBy] || "לא ידוע"}</p>
-                        <p><strong>הוקצתה ל:</strong> {users[selectedTask.assignedTo] || "לא ידוע"}</p>
-                        <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>✏ ערוך משימה</button>
+                        <p><span className={styles.label}>📅 תאריך יעד:</span> {formatDate(selectedTask.dueDate)}</p>
+                        <p><span className={styles.label}>👤 יוצר:</span> {users[selectedTask.createdBy] || "לא ידוע"}</p>
+                        <p><span className={styles.label}>🎯 הוקצתה ל:</span> {users[selectedTask.assignedTo] || "לא ידוע"}</p>
+
+                        <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>
+                            ✏ ערוך משימה
+                        </button>
                     </div>
                 </div>
             )}
+
         </div>
     );
-
-
 };
 
 export default Dashboard;

@@ -1,7 +1,6 @@
 const TEAM_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users/teams';
 //const TEAM_API_URL = 'http://localhost:5000/api/users/teams';
 
-/** 📌 יצירת צוות חדש */
 export const createTeam = async (teamData) => {
     try {
         const res = await fetch(`${TEAM_API_URL}/create`, {
@@ -22,7 +21,6 @@ export const createTeam = async (teamData) => {
     }
 };
 
-/** 📌 שליפת כל הצוותים */
 export const getTeams = async () => {
     const res = await fetch(TEAM_API_URL, {
         method: 'GET',
@@ -34,7 +32,6 @@ export const getTeams = async () => {
     return res.json();
 };
 
-/** 📌 הוספת משתמש לצוות */
 export const addUserToTeam = async (teamId, userId) => {
     try {
         const res = await fetch(`${TEAM_API_URL}/${teamId}/addUser`, {

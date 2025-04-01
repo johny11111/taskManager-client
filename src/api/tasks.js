@@ -4,21 +4,8 @@ const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/tasks';
 //const USERS_API_URL = 'http://localhost:5000/api/users';
 const USERS_API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users'; 
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
 
-    if (!token) {
-        console.error("❌ No authentication token found.");
-        throw new Error('No authentication token found');
-    }
 
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-};
-
-// 📌 הבאת המשימות של המשתמש המחובר בלבד
 export const getTasks = async () => {
     const res = await fetch(API_URL, {
       method: 'GET',
@@ -34,7 +21,6 @@ export const getTasks = async () => {
     return res.json();
   };
   
-// 📌 הבאת רשימת המשתמשים
 // export const getUsers = async () => {
 //     try {
 //         const res = await fetch(`${USERS_API_URL}/all`, { headers: getAuthHeaders() });
@@ -62,8 +48,6 @@ export const getTeamMembers = async (teamId) => {
     return res.json();
   };
 
-
-// 📌 יצירת משימה חדשה
 export const createTaskForTeam = async (teamId, taskData) => {
     console.log(`📤 שולח משימה לצוות: ${teamId}`);
   
@@ -85,8 +69,6 @@ export const createTaskForTeam = async (teamId, taskData) => {
     return res.json();
   };
 
-
-// 📌 עדכון סטטוס של משימה
 export const updateTaskStatus = async (id, status) => {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
@@ -125,7 +107,6 @@ export const updateTask = async (taskId, updatedData) => {
     return res.json();
   };
 
-// 📌 מחיקת משימה
 export const deleteTask = async (id) => {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
@@ -157,7 +138,7 @@ export const getTeamById = async (teamId) => {
 
     const res = await fetch(`${API_URL}/team/${teamId}`, {
         method: 'GET',
-        credentials: 'include' // ✅ שולח את ה-cookie עם ה-JWT
+        credentials: 'include' 
     });
 
     if (!res.ok) {

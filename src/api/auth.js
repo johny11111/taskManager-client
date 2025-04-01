@@ -1,5 +1,4 @@
 const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
-// API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
 //const API_URL = 'http://localhost:5000/api/users';
 
 
@@ -41,7 +40,6 @@ export const logoutUser = async () => {
     return res.json();
 };
 
-// 📌 הבאת המשתמש המחובר לפי העוגייה
 export const getMe = async () => {
     const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/me', {
       credentials: 'include', // שולח את העוגייה עם הבקשה

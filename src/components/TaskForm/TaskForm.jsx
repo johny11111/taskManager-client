@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createTaskForTeam, getTeamMembers, updateTask } from '../../api/tasks';
 import styles from "./TaskForm.module.css";
 
-const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
+const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete, isDarkMode }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
@@ -18,7 +18,7 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
       setTitle(taskToEdit.title);
       setDescription(taskToEdit.description);
       setAssignedTo(taskToEdit.assignedTo);
-      setDueDate(new Date(taskToEdit.dueDate).toISOString().slice(0, 16)); // עבור input datetime-local
+      setDueDate(new Date(taskToEdit.dueDate).toISOString().slice(0, 16));
     }
   }, [taskToEdit]);
 
@@ -49,16 +49,14 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
 
     try {
       if (taskToEdit) {
-        // עדכון משימה קיימת
         await updateTask(taskToEdit._id, {
           title,
           description,
           assignedTo,
           dueDate: dueDateISO
         });
-        onEditComplete?.(); // עדכון רשימת משימות או סגירת טופס
+        onEditComplete?.();
       } else {
-        // יצירת משימה חדשה
         await createTaskForTeam(teamId, {
           title,
           description,
@@ -68,7 +66,6 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
         onTaskAdded?.();
       }
 
-      // ניקוי שדות
       setTitle('');
       setDescription('');
       setAssignedTo('');
@@ -80,7 +77,10 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete }) => {
   };
 
   return (
-    <form className={styles.taskForm} onSubmit={handleSubmit}>
+    <form
+      className={`${styles.taskForm} ${isDarkMode ? styles.darkForm : ''}`}
+      onSubmit={handleSubmit}
+    >
       <div className={styles.formGroup}>
         <label>כותרת המשימה</label>
         <input

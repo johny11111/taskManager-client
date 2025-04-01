@@ -2,13 +2,9 @@ import { useEffect } from 'react';
 
 const OAuth2Callback = () => {
   useEffect(() => {
-    // תומך גם ב־hash וגם ב־search
     const fullQuery = window.location.search || window.location.hash.split('?')[1] || '';
     const urlParams = new URLSearchParams(fullQuery);
-
- 
     const isCalendarConnected = urlParams.get("calendar_connected");
-
     const redirectTo = `/#/teams${isCalendarConnected ? '?calendar_connected=true' : ''}`;
 
     window.location.href = redirectTo;

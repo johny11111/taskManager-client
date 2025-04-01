@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { loginUser } from '../../api/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './Login.module.css';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
-const Login = ({ setUser , headerHeight }) => {
+const Login = ({ setUser, headerHeight }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -11,7 +13,6 @@ const Login = ({ setUser , headerHeight }) => {
   const navigate = useNavigate();
 
   const containerHeight = `calc(100dvh - ${headerHeight}px)`;
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,22 +22,59 @@ const Login = ({ setUser , headerHeight }) => {
       const data = await loginUser({ email, password });
 
       if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user)); // אין יותר token
-        setUser(data.user);
+        const user = data.user;
+        const userId = user._id || user.id;
+
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+
+        // ✅ בדוק אם צריך להציע חיבור ליומן
+        if (!user.googleCalendar?.access_token && !localStorage.getItem("declinedGoogleCalendar")) {
+          const wantsToConnect = window.confirm("רוצה לחבר את היומן כדי לראות משימות ביומן Google?");
+          if (wantsToConnect) {
+            await connectToGoogleCalendar(userId);
+            return; // חכה שיחזור מהיומן → אל תעשה navigate עכשיו
+          } else {
+            localStorage.setItem("declinedGoogleCalendar", "true");
+          }
+        }
+
+        // ✅ ניווט רק לאחר טיפול ביומן
         navigate('/teams');
       } else {
         setError(data.message || 'Login failed');
       }
-
     } catch (err) {
       setError('Error connecting to server');
     }
   };
 
+  const connectToGoogleCalendar = async (userId) => {
+    if (!userId) {
+      console.error("❌ לא ניתן להתחבר ליומן – userId חסר");
+      return;
+    }
 
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
+    const scope = 'https://www.googleapis.com/auth/calendar';
+    const isApp = Capacitor.isNativePlatform();
+
+    const state = encodeURIComponent(JSON.stringify({
+      userId,
+      returnTo: '/teams',
+      platform: isApp ? 'app' : 'web'
+    }));
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent&state=${state}`;
+
+    await Browser.open({ url: authUrl, windowName: "_system" });
+  };
 
   return (
-     <div className={styles.containerLogin} style={{ minHeight: containerHeight }}>
+    <div className={styles.containerLogin} style={{ minHeight: containerHeight }}>
       <div className={styles.card}>
         <h2 className={styles.title}>התחברות</h2>
 
@@ -79,7 +117,6 @@ const Login = ({ setUser , headerHeight }) => {
             </div>
           </div>
 
-
           <button type="submit" className={styles.btnLogin}>התחבר/י</button>
         </form>
 
@@ -89,7 +126,6 @@ const Login = ({ setUser , headerHeight }) => {
       </div>
     </div>
   );
-
 };
 
 export default Login;
