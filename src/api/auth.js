@@ -35,21 +35,38 @@ export const loginUser = async (userData) => {
 export const logoutUser = async () => {
     const res = await fetch(`${API_URL}/logout`, {
         method: 'POST',
-        credentials: 'include' 
+        credentials: 'include'
     });
     return res.json();
 };
 
 export const getMe = async () => {
     const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/me', {
-      credentials: 'include', // שולח את העוגייה עם הבקשה
+        credentials: 'include', // שולח את העוגייה עם הבקשה
     });
-  
+
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`❌ שגיאה בשליפת המשתמש: ${res.status} - ${text}`);
+        const text = await res.text();
+        throw new Error(`❌ שגיאה בשליפת המשתמש: ${res.status} - ${text}`);
     }
-  
+
     return res.json();
-  };
-  
+};
+
+export const refreshToken = async () => {
+    try {
+        const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/refresh', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (!res.ok) throw new Error('Failed to refresh token');
+
+        const data = await res.json();
+        return data.user;
+    } catch (err) {
+        console.error('🔁 שגיאה ברענון טוקן:', err);
+        return null;
+    }
+};
+

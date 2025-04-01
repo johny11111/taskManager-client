@@ -26,6 +26,54 @@ function App() {
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
 
+  useEffect(() => {
+    const checkUser = async () => {
+      const storedUser = localStorage.getItem('user');
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        setLoading(false);
+      } else {
+        // 🔁 בדיקה גם מ־Capacitor
+        const prefUser = await Preferences.get({ key: 'user' });
+        if (prefUser.value) {
+          const parsed = JSON.parse(prefUser.value);
+          setUser(parsed);
+          localStorage.setItem('user', JSON.stringify(parsed)); // לשימוש רגיל
+          setLoading(false);
+          return;
+        }
+
+        try {
+          let res;
+          try {
+            res = await getMe();
+          } catch (err) {
+            console.warn("🔄 הטוקן פג תוקף, מנסה לרענן...");
+            res = await refreshToken(); 
+          }
+
+          if (res?._id) {
+            setUser(res);
+            localStorage.setItem('user', JSON.stringify(res));
+            await Preferences.set({ key: 'user', value: JSON.stringify(res) });
+          } else {
+            throw new Error('No valid user');
+          }
+        } catch (err) {
+          console.warn('❌ לא אותר משתמש מהשרת');
+          setUser(null);
+          localStorage.removeItem('user');
+          await Preferences.remove({ key: 'user' });
+          window.location.href = "/#/login";
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    checkUser();
+  }, []);
 
   useEffect(() => {
     CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
@@ -87,7 +135,7 @@ function App() {
 
 
 
-  
+
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -96,11 +144,12 @@ function App() {
     }
 
     localStorage.removeItem('user');
+    await Preferences.remove({ key: 'user' }); // 🧹 ניקוי גם מה־Capacitor
+
     setUser(null);
     setToken(null);
     setSelectedTeam(null);
 
-    // 🔁 הפניה ברורה ללוגין
     window.location.href = '/#/login';
   };
 

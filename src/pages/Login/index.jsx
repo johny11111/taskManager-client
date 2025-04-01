@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import styles from './Login.module.css';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
+import { Preferences } from '@capacitor/preferences';
 
 const Login = ({ setUser, headerHeight }) => {
   const [email, setEmail] = useState('');
@@ -25,22 +26,19 @@ const Login = ({ setUser, headerHeight }) => {
         const user = data.user;
         const userId = user._id || user.id;
 
-        localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
-
-        // ✅ בדוק אם צריך להציע חיבור ליומן
+        await Preferences.set({ key: 'user', value: JSON.stringify(user) });
+        navigate('/teams');
         if (!user.googleCalendar?.access_token && !localStorage.getItem("declinedGoogleCalendar")) {
           const wantsToConnect = window.confirm("רוצה לחבר את היומן כדי לראות משימות ביומן Google?");
           if (wantsToConnect) {
             await connectToGoogleCalendar(userId);
-            return; // חכה שיחזור מהיומן → אל תעשה navigate עכשיו
+            return;
           } else {
             localStorage.setItem("declinedGoogleCalendar", "true");
           }
         }
 
-        // ✅ ניווט רק לאחר טיפול ביומן
-        navigate('/teams');
       } else {
         setError(data.message || 'Login failed');
       }
