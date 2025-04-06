@@ -4,7 +4,7 @@ const API_URL = 'https://taskmanager-server-ygfb.onrender.com/api/users';
 
 export const registerUser = async ({ name, email, password, token }) => {
     try {
-        const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/register', {
+        const res = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, token })
@@ -20,7 +20,7 @@ export const loginUser = async (userData) => {
     const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ⬅️ חובה בשביל לקבל את ה-cookie
+        credentials: 'include',
         body: JSON.stringify(userData)
     });
 
@@ -41,8 +41,8 @@ export const logoutUser = async () => {
 };
 
 export const getMe = async () => {
-    const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/me', {
-        credentials: 'include', // שולח את העוגייה עם הבקשה
+    const res = await fetch(`${API_URL}/me`, {
+        credentials: 'include', 
     });
 
     if (!res.ok) {
@@ -55,7 +55,7 @@ export const getMe = async () => {
 
 export const refreshToken = async () => {
     try {
-        const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/refresh', {
+        const res = await fetch(`${API_URL}/refresh`, {
             method: 'POST',
             credentials: 'include'
         });

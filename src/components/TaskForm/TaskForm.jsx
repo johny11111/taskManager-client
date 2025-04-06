@@ -13,6 +13,8 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete, isDarkMode 
     if (teamId) fetchUsers();
   }, [teamId]);
 
+
+
   useEffect(() => {
     if (taskToEdit) {
       setTitle(taskToEdit.title);
@@ -25,6 +27,8 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete, isDarkMode 
   const fetchUsers = async () => {
     try {
       const data = await getTeamMembers(teamId);
+      console.log(data);
+
       setUsers(data);
     } catch (error) {
       console.error("❌ Error fetching users:", error);
@@ -81,6 +85,9 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete, isDarkMode 
       className={`${styles.taskForm} ${isDarkMode ? styles.darkForm : ''}`}
       onSubmit={handleSubmit}
     >
+      <h2 className={styles.formTitle}>
+        {taskToEdit ? '✏️ עדכון משימה' : '📝 משימה חדשה'}
+      </h2>
       <div className={styles.formGroup}>
         <label>כותרת המשימה</label>
         <input
@@ -100,19 +107,26 @@ const TaskForm = ({ teamId, onTaskAdded, taskToEdit, onEditComplete, isDarkMode 
         />
       </div>
 
-      <div className={styles.formGroup}>
-        <label>הקצה למשתמש</label>
-        <select
-          value={assignedTo}
-          onChange={(e) => setAssignedTo(e.target.value)}
-          required
-        >
-          <option value="">בחר משתמש</option>
-          {users.map(user => (
-            <option key={user._id} value={user._id}>{user.name}</option>
-          ))}
-        </select>
-      </div>
+      {!taskToEdit && (
+        <div className={styles.formGroup}>
+          <label>הקצה למשתמש</label>
+          <select
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            required
+          >
+            <option value="">בחר משתמש</option>
+
+            <option value="all">👥 כל המשתמשים</option>
+            {users.map(user => (
+              <option key={user.userId?._id || user.userId?._id} value={user.userId._id}>
+                {user.userId.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
 
       <div className={styles.formGroup}>
         <label>תאריך יעד (כולל שעה)</label>

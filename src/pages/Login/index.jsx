@@ -18,27 +18,33 @@ const Login = ({ setUser, headerHeight }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     try {
       const data = await loginUser({ email, password });
-
+  
       if (data.user) {
-        const user = data.user;
-        const userId = user._id || user.id;
-
-        setUser(user);
-        await Preferences.set({ key: 'user', value: JSON.stringify(user) });
+        const originalUser = data.user;
+        const fixedUser = {
+          ...originalUser,
+          _id: originalUser._id || originalUser.id, // ✅ לוודא שיש תמיד _id
+        };
+  
+        setUser(fixedUser);
+        await Preferences.set({ key: 'user', value: JSON.stringify(fixedUser) });
+        localStorage.setItem('user', JSON.stringify(fixedUser));
+  
         navigate('/teams');
-        if (!user.googleCalendar?.access_token && !localStorage.getItem("declinedGoogleCalendar")) {
+  
+        if (!fixedUser.googleCalendar?.access_token && !localStorage.getItem("declinedGoogleCalendar")) {
           const wantsToConnect = window.confirm("רוצה לחבר את היומן כדי לראות משימות ביומן Google?");
           if (wantsToConnect) {
-            await connectToGoogleCalendar(userId);
+            await connectToGoogleCalendar(fixedUser._id);
             return;
           } else {
             localStorage.setItem("declinedGoogleCalendar", "true");
           }
         }
-
+  
       } else {
         setError(data.message || 'Login failed');
       }
@@ -46,6 +52,7 @@ const Login = ({ setUser, headerHeight }) => {
       setError('Error connecting to server');
     }
   };
+  
 
   const connectToGoogleCalendar = async (userId) => {
     if (!userId) {
@@ -54,6 +61,7 @@ const Login = ({ setUser, headerHeight }) => {
     }
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    //const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const redirectUri = 'https://taskmanager-server-ygfb.onrender.com/api/google/calendar/callback';
     const scope = 'https://www.googleapis.com/auth/calendar';
     const isApp = Capacitor.isNativePlatform();

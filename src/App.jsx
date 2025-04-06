@@ -13,6 +13,7 @@ import { logoutUser, getMe } from './api/auth';
 import OAuth2Callback from './pages/OAuth2Callback'
 import { App as CapacitorApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
+import { Preferences } from '@capacitor/preferences';
 
 
 

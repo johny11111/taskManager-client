@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { getTeams , createTeam } from '../../api/teams';
+import { getTeams, createTeam } from '../../api/teams';
 import { useNavigate } from 'react-router-dom';
 import styles from "./TeamsPage.module.css";
 import { UserContext } from '../../context/UserContext';
@@ -8,12 +8,15 @@ import { UserContext } from '../../context/UserContext';
 const TeamsPage = () => {
   const [teams, setTeams] = useState([]);
   const [teamName, setTeamName] = useState('');
-  const { user , darkMode } = useContext(UserContext);
+  const { user, darkMode } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTeams();
-  }, []);
+
+    if (user?._id) {
+      fetchTeams();
+    }
+  }, [user]);
 
   const fetchTeams = async () => {
     const data = await getTeams();
@@ -27,28 +30,30 @@ const TeamsPage = () => {
       alert("🛑 יש להזין שם לצוות!");
       return;
     }
-  
+
     try {
       const data = await createTeam({ name: teamName });
       setTeams(prev => [...prev, data.team]);
+
       setTeamName('');
     } catch (error) {
       alert("❌ שגיאה ביצירת צוות");
     }
   };
 
+
   const deleteTeam = async (teamId) => {
     const confirmDelete = window.confirm("❗ האם אתה בטוח שברצונך למחוק את הצוות?");
     if (!confirmDelete) return;
 
-  
+
     const res = await fetch(`https://taskmanager-server-ygfb.onrender.com/api/users/teams/${teamId}`, {
       method: 'DELETE',
-      headers: { 
-         'Content-Type': 'application/json'
-       },
-       credentials: 'include',
-       
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+
     });
 
     const data = await res.json();
@@ -63,7 +68,7 @@ const TeamsPage = () => {
   return (
     <div className={`${styles.container} ${darkMode ? styles.dark : ''}`}>
       <h1 className={styles.title}>🏢 ניהול צוותים</h1>
-  
+
       <form onSubmit={handleCreateTeam} className={styles.form}>
         <label htmlFor="teamName">שם הצוות</label>
         <input
@@ -76,7 +81,7 @@ const TeamsPage = () => {
         />
         <button type="submit" className={styles.createBtn}>➕ צור צוות</button>
       </form>
-  
+
       <h3 className={styles.subTitle}>📋 הצוותים שלי</h3>
       <ul className={styles.teamList}>
         {teams.map(team => (
@@ -87,8 +92,7 @@ const TeamsPage = () => {
             >
               {team.name} 🏢 ({team.members?.length} חברים)
             </span>
-  
-            {team.createdBy === user?.id && (
+            {team.createdBy?.toString() === user?._id && (
               <button
                 onClick={() => deleteTeam(team._id)}
                 className={styles.deleteBtn}
@@ -101,7 +105,7 @@ const TeamsPage = () => {
       </ul>
     </div>
   );
-  
+
 };
 
 export default TeamsPage;

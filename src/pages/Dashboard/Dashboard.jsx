@@ -10,25 +10,29 @@ const Dashboard = () => {
     const [team, setTeam] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [users, setUsers] = useState({});
-    const [user, setUser] = useState(null);
+
     const [selectedTask, setSelectedTask] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [selectedTab, setSelectedTab] = useState('today');
-    const [userId, setUserId] = useState(null);
+
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
     const [taskToEdit, setTaskToEdit] = useState(null);
-    const { darkMode } = useContext(UserContext);
+    const { darkMode, user, setUser } = useContext(UserContext);
+    const userId = user?._id || user?.id;
+
     const [hideHeader, setHideHeader] = useState(false);
     const lastScrollY = useRef(0);
+    const [isAdmin, setIsAdmin] = useState(false);
+
 
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > lastScrollY.current && window.scrollY > 100) {
-                setHideHeader(true); 
+                setHideHeader(true);
             } else {
-                setHideHeader(false); 
+                setHideHeader(false);
             }
             lastScrollY.current = window.scrollY;
         };
@@ -41,34 +45,39 @@ const Dashboard = () => {
         document.body.classList.toggle('dark', darkMode);
     }, [darkMode]);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            setUser(userData);
-            setUserId(userData.id || userData._id);
-        } else {
-            console.warn("🚨 אין משתמש מחובר ב-LocalStorage!");
-        }
-    }, []);
+
 
     useEffect(() => {
+        if (!teamId || !userId) return;
 
-        if (teamId) {
-            fetchTeamDetails();
-            fetchTasks();
-            fetchUsers();
-        }
+        const loadData = async () => {
+            await fetchTeamDetails();
+            await fetchTasks();
+            await fetchUsers();
+        };
+
+        loadData();
     }, [teamId, userId]);
 
     const fetchTeamDetails = async () => {
         try {
             const teamData = await getTeamById(teamId);
             setTeam(teamData);
+
+            const foundMember = teamData?.members?.find(m =>
+                m?.userId === userId || m?.userId?._id === userId
+            );
+
+            if (foundMember?.role === 'admin') {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+            }
         } catch (error) {
             console.error("❌ שגיאה בקבלת פרטי הצוות:", error);
         }
     };
+
 
     const fetchTasks = async () => {
         if (!teamId) return;
@@ -83,10 +92,14 @@ const Dashboard = () => {
     const fetchUsers = async () => {
         try {
             const data = await getTeamMembers(teamId);
-            const usersMap = data.reduce((map, user) => {
-                map[user._id] = user.name;
+            const usersMap = (data || []).reduce((map, member) => {
+                const user = member?.userId;
+                if (user && user._id) {
+                    map[user._id] = user.name;
+                }
                 return map;
             }, {});
+
             setUsers(usersMap);
         } catch (error) {
             console.error('❌ שגיאה בשליפת חברי הצוות:', error);
@@ -201,6 +214,7 @@ const Dashboard = () => {
                     {team ? `📋 ניהול משימות - ${team.name}` : '📋 טוען ...'}
                 </h1>
             </div>
+            <p>המשתמש שלך הוא: {isAdmin ? '🧑‍💼 מנהל' : '👤 חבר צוות'}</p>
 
             <div className={`${styles.selectTamp} ${hideHeader ? styles.hidden : ''}`}>
                 <div className={styles.filterButtons}>
@@ -217,7 +231,7 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                <div className={styles.inviteSection}>
+                {isAdmin && <div className={styles.inviteSection}>
                     <label>📧 הזמן חבר לצוות לפי מייל</label>
                     <input
                         type="email"
@@ -227,16 +241,17 @@ const Dashboard = () => {
                     />
                     <button className={styles.inviteButton} onClick={handleSendInvite}>✉️ שלח הזמנה</button>
                     {inviteMessage && <p className={styles.inviteMessage}>{inviteMessage}</p>}
-                </div>
+                </div>}
             </div>
 
 
             <div className={`${styles.taskList} ${hideHeader ? styles.withoutHeader : ''}`}>
-                {team && (
+                {isAdmin && (
                     <button className={styles.addTaskButton} onClick={() => setShowTaskForm(true)}>
                         ➕
                     </button>
                 )}
+
                 {showTaskForm && (
                     <div className={styles.modalWrapper}>
                         <div className={styles.modalContent}>
@@ -291,7 +306,7 @@ const Dashboard = () => {
                                         {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
                                     </button>
 
-                                    {task.status === 'completed' && (
+                                    {task.status === 'completed' && isAdmin && (
                                         <button
                                             className={styles.deleteBtn}
                                             onClick={() => handleDeleteTask(task._id)}
@@ -318,10 +333,14 @@ const Dashboard = () => {
                         <p><span className={styles.label}>📅 תאריך יעד:</span> {formatDate(selectedTask.dueDate)}</p>
                         <p><span className={styles.label}>👤 יוצר:</span> {users[selectedTask.createdBy] || "לא ידוע"}</p>
                         <p><span className={styles.label}>🎯 הוקצתה ל:</span> {users[selectedTask.assignedTo] || "לא ידוע"}</p>
+                        {
+                            isAdmin && (
+                                <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>
+                                    ✏ ערוך משימה
+                                </button>
+                            )
+                        }
 
-                        <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>
-                            ✏ ערוך משימה
-                        </button>
                     </div>
                 </div>
             )}
