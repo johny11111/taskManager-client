@@ -4,28 +4,48 @@ import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamBy
 import TaskForm from '../../components/TaskForm/TaskForm';
 import styles from "./Dashboard.module.css";
 import { UserContext } from '../../context/UserContext';
+import toast from 'react-hot-toast';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+
+
 
 const Dashboard = () => {
     const { teamId } = useParams();
     const [team, setTeam] = useState(null);
     const [tasks, setTasks] = useState([]);
-    const [users, setUsers] = useState({});
+    const [loading, setLoading] = useState(false);
 
+    const [users, setUsers] = useState({});
+    const [viewMode, setViewMode] = useState(() => {
+        return localStorage.getItem('viewMode') || 'list';
+    });
     const [selectedTask, setSelectedTask] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [selectedTab, setSelectedTab] = useState('today');
-
+    const [searchTerm, setSearchTerm] = useState('');
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteMessage, setInviteMessage] = useState('');
     const [taskToEdit, setTaskToEdit] = useState(null);
     const { darkMode, user, setUser } = useContext(UserContext);
     const userId = user?._id || user?.id;
-
     const [hideHeader, setHideHeader] = useState(false);
+    const [animatingTab, setAnimatingTab] = useState(false);
     const lastScrollY = useRef(0);
     const [isAdmin, setIsAdmin] = useState(false);
+    const API_URL = 'https://taskmanager-server-ygfb.onrender.com';
+    //const API_URL = 'http://localhost:5000';
 
+    useEffect(() => {
+        localStorage.setItem('viewMode', viewMode);
+    }, [viewMode]);
+
+
+    useEffect(() => {
+        setAnimatingTab(true);
+        const timer = setTimeout(() => setAnimatingTab(false), 300);
+        return () => clearTimeout(timer);
+    }, [selectedTab]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -81,11 +101,14 @@ const Dashboard = () => {
 
     const fetchTasks = async () => {
         if (!teamId) return;
+        setLoading(true);
         try {
             const data = await getTasksByTeam(teamId);
             setTasks(data);
         } catch (error) {
             console.error('❌ שגיאה בשליפת משימות:', error);
+        } finally {
+            setLoading(false); // ← סיים טעינה
         }
     };
 
@@ -106,14 +129,17 @@ const Dashboard = () => {
         }
     };
 
+
     const handleCompleteTask = async (taskId, currentStatus) => {
         if (currentStatus === 'completed') {
             const confirm = window.confirm("❓ המשימה סומנה כבוצעה. האם להחזיר למצב המתנה?");
             if (!confirm) return;
 
             await updateTaskStatus(taskId, 'pending');
+            toast.success("↩️ המשימה הוחזרה למצב המתנה");
         } else {
             await updateTaskStatus(taskId, 'completed');
+            toast.success("✔️ המשימה סומנה כבוצעה");
         }
 
         fetchTasks(); // רענון המשימות לאחר שינוי
@@ -131,10 +157,16 @@ const Dashboard = () => {
     const handleDeleteTask = async (taskId) => {
         const confirmDelete = window.confirm("❌ האם אתה בטוח שברצונך למחוק את המשימה?");
         if (confirmDelete) {
-            await deleteTask(taskId);
-            fetchTasks();
+            try {
+                await deleteTask(taskId);
+                toast.success("🗑️ המשימה נמחקה בהצלחה");
+                fetchTasks();
+            } catch (error) {
+                toast.error("⚠️ שגיאה במחיקת המשימה");
+            }
         }
     };
+
 
     const handleEditTask = (task) => {
         setTaskToEdit(task);
@@ -146,55 +178,58 @@ const Dashboard = () => {
     const filteredTasks = useMemo(() => {
         const today = new Date().toISOString().split('T')[0];
 
-        if (!userId || !teamId) return [];
-
         return tasks.filter(task => {
-            const taskDueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
+            const titleMatch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
+            const dueDate = task.dueDate ? task.dueDate.split('T')[0] : null;
 
-            if (selectedTab === 'all') return true;
-            if (selectedTab === 'today') return taskDueDate === today && task.status !== 'completed';
-            if (selectedTab === 'upcoming') return taskDueDate > today && task.status !== 'completed';
-            if (selectedTab === 'completed') return task.status === 'completed';
+            const statusMatch =
+                selectedTab === 'all' ||
+                (selectedTab === 'today' && dueDate === today && task.status !== 'completed') ||
+                (selectedTab === 'upcoming' && dueDate > today && task.status !== 'completed') ||
+                (selectedTab === 'completed' && task.status === 'completed');
+
+            return titleMatch && statusMatch;
         });
-    }, [tasks, selectedTab, teamId, userId]);
+    }, [tasks, selectedTab, searchTerm]);
+
+  
 
     const handleSendInvite = async () => {
         if (!inviteEmail.trim()) {
-            setInviteMessage('🛑 נא להזין כתובת מייל');
+            toast.error('🛑 נא להזין כתובת מייל');
             return;
         }
-
+    
         const storedTeam = localStorage.getItem('teamId');
         const finalTeamId = teamId || storedTeam;
-
+    
         if (!finalTeamId) {
-            setInviteMessage('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
+            toast.error('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
             return;
         }
-
+    
         try {
-            const res = await fetch('https://taskmanager-server-ygfb.onrender.com/api/users/invite', {
+            const res = await fetch(`${API_URL}/api/users/invite`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include', // ✅ שולח את ה-cookie עם ה־JWT
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId })
             });
-
+    
             const data = await res.json();
-
+    
             if (res.ok) {
-                setInviteMessage('✅ ההזמנה נשלחה בהצלחה!');
+                toast.success('✅ ההזמנה נשלחה בהצלחה!');
                 setInviteEmail('');
             } else {
-                setInviteMessage(`❌ שגיאה: ${data.message}`);
+                toast.error(`❌ שגיאה: ${data.message}`);
             }
         } catch (err) {
             console.error('❌ שגיאה בשליחת ההזמנה:', err);
-            setInviteMessage('❌ שגיאה בשליחת ההזמנה');
+            toast.error('❌ שגיאה כללית בשליחת ההזמנה');
         }
     };
+    
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
@@ -208,12 +243,14 @@ const Dashboard = () => {
     };
 
     return (
-        <div className={`${styles.dashboardContainer} ${darkMode ? styles.dark : ''} `} >
+        <div className={`${styles.dashboardContainer} ${darkMode ? styles.dark : ''}`}>
+
             <div className={styles.headerSticky}>
                 <h1 className={styles.title}>
                     {team ? `📋 ניהול משימות - ${team.name}` : '📋 טוען ...'}
                 </h1>
             </div>
+
             <p>המשתמש שלך הוא: {isAdmin ? '🧑‍💼 מנהל' : '👤 חבר צוות'}</p>
 
             <div className={`${styles.selectTamp} ${hideHeader ? styles.hidden : ''}`}>
@@ -231,97 +268,181 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                {isAdmin && <div className={styles.inviteSection}>
-                    <label>📧 הזמן חבר לצוות לפי מייל</label>
-                    <input
-                        type="email"
-                        placeholder="הזן כתובת מייל"
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
-                    />
-                    <button className={styles.inviteButton} onClick={handleSendInvite}>✉️ שלח הזמנה</button>
-                    {inviteMessage && <p className={styles.inviteMessage}>{inviteMessage}</p>}
-                </div>}
+                {isAdmin && (
+                    <div className={styles.inviteSection}>
+                        <label>📧 הזמן חבר לצוות לפי מייל</label>
+                        <input
+                            type="email"
+                            placeholder="הזן כתובת מייל"
+                            value={inviteEmail}
+                            onChange={(e) => setInviteEmail(e.target.value)}
+                        />
+                        <button className={styles.inviteButton} onClick={handleSendInvite}>
+                            ✉️ שלח הזמנה
+                        </button>
+                        {inviteMessage && <p className={styles.inviteMessage}>{inviteMessage}</p>}
+                    </div>
+                )}
             </div>
 
+            <div style={{ marginTop: '1rem' }}>
+                <input
+                    type="text"
+                    placeholder="🔍 חפש משימה לפי שם..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                />
+            </div>
 
-            <div className={`${styles.taskList} ${hideHeader ? styles.withoutHeader : ''}`}>
+            <div className={`${styles.taskList} ${hideHeader ? styles.withoutHeader : ''} ${animatingTab ? styles.entering : ''}`}>
+
                 {isAdmin && (
                     <button className={styles.addTaskButton} onClick={() => setShowTaskForm(true)}>
                         ➕
                     </button>
                 )}
 
-                {showTaskForm && (
-                    <div className={styles.modalWrapper}>
-                        <div className={styles.modalContent}>
-                            <button className={styles.closeModal} onClick={() => {
-                                setShowTaskForm(false);
-                                setTaskToEdit(null);
-                            }}>X</button>
-                            <TaskForm
-                                teamId={teamId}
-                                taskToEdit={taskToEdit}
-                                isDarkMode={darkMode}
-                                users={Object.entries(users).map(([id, name]) => ({ _id: id, name }))}
-                                onTaskAdded={() => {
-                                    fetchTasks();
-                                    setShowTaskForm(false);
-                                }}
-                                onEditComplete={() => {
-                                    fetchTasks();
-                                    setShowTaskForm(false);
-                                    setTaskToEdit(null);
-                                }}
-                            />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                    <button
+                        className={styles.viewToggle}
+                        onClick={() => setViewMode(viewMode === 'list' ? 'kanban' : 'list')}
+                    >
+                        {viewMode === 'list' ? '🔳 מעבר לטבלה' : '📋 מעבר לרשימה'}
+                    </button>
+                </div>
 
-                        </div>
+                {/* תצוגת משימות */}
+
+                {loading ? (
+                    <div className={styles.spinnerWrapper}>
+                        <div className={styles.spinner}></div>
+                        <p>טוען משימות...</p>
+                    </div>
+
+                ) : filteredTasks.length === 0 ? (
+                    <p className={styles.noTasks}>📭 אין משימות להצגה</p>
+                ) : viewMode === 'list' ? (
+                    <ul className={styles.taskItems}>
+                        {filteredTasks.map(task => {
+                            const isCreator = task.createdBy === userId;
+                            const isAssigned = task.assignedTo === userId;
+                            const creatorName = users[task.createdBy] || "לא ידוע";
+
+                            return (
+                                <li key={task._id} className={styles.taskItem}>
+                                    <div className={styles.taskDetails} onClick={() => handleShowTaskDetails(task)}>
+                                        <span className={`${styles.taskTitle} ${isCreator ? styles.taskTitle : isAssigned ? styles.assigned : styles.taskTitle}`}>
+                                            {task.title}
+                                        </span>
+                                        <small className={styles.creatorInfo}>📝 {creatorName} - יוצר המשימה</small>
+                                    </div>
+
+                                    <div className={styles.taskActions}>
+                                        <span className={`${styles.statusBadge} ${task.status}`}>
+                                            {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
+                                        </span>
+
+                                        <button className={styles.actionBtn} onClick={() => handleCompleteTask(task._id, task.status)}>
+                                            {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
+                                        </button>
+
+                                        {task.status === 'completed' && isAdmin && (
+                                            <button className={styles.deleteBtn} onClick={() => handleDeleteTask(task._id)}>
+                                                🗑
+                                            </button>
+                                        )}
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                ) : (
+                    <div className={styles.kanbanBoard}>
+                        {/* בעתיד ניתן להוסיף כאן טור נוסף לסטטוס 'inProgress' אם נחליט לתמוך בזה */}
+                        {['pending', 'completed'].map(status => (
+                            <div key={status} className={styles.kanbanColumn}>
+                                <h3>
+                                    {status === 'pending' ? '⏳ בהמתנה' :
+                                        status === 'inProgress' ? '🚧 בתהליך' : '✅ בוצע'}
+                                </h3>
+
+                                {filteredTasks
+                                    .filter(task => task.status === status)
+                                    .map((task, i) => {
+                                        const isCreator = task.createdBy === userId;
+                                        const isAssigned = task.assignedTo === userId;
+                                        const creatorName = users[task.createdBy] || "לא ידוע";
+
+                                        return (
+                                            <div
+                                                key={task._id}
+                                                className={styles.taskItem}
+                                                onClick={() => handleShowTaskDetails(task)}
+                                                style={{ animationDelay: `${i * 50}ms` }} // stagger עדין בין כרטיסים
+                                            >
+                                                <span className={`${styles.taskTitle} ${isCreator ? styles.taskTitle : isAssigned ? styles.assigned : styles.taskTitle}`}>
+                                                    {task.title}
+                                                </span>
+                                                <small className={styles.creatorInfo}>📝 {creatorName} - יוצר המשימה</small>
+
+                                                <div className={styles.taskActions}>
+                                                    <span className={`${styles.statusBadge} ${task.status}`}>
+                                                        {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
+                                                    </span>
+
+                                                    <button className={styles.actionBtn} onClick={() => handleCompleteTask(task._id, task.status)}>
+                                                        {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
+                                                    </button>
+
+                                                    {task.status === 'completed' && isAdmin && (
+                                                        <button className={styles.deleteBtn} onClick={() => handleDeleteTask(task._id)}>
+                                                            🗑
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                            </div>
+                        ))}
                     </div>
                 )}
 
-                <ul className={styles.taskItems}>
-                    {filteredTasks.map(task => {
-                        const isCreator = task.createdBy === userId;
-                        const isAssigned = task.assignedTo === userId;
-                        const creatorName = users[task.createdBy] || "לא ידוע";
-
-                        return (
-                            <li key={task._id} className={styles.taskItem}>
-                                <div className={styles.taskDetails} onClick={() => handleShowTaskDetails(task)}>
-                                    <span className={`${styles.taskTitle} ${isCreator ? `${styles.taskTitle}` : isAssigned ? `${styles.assigned}` : `${styles.taskTitle}`}`}>
-                                        {task.title}
-                                    </span>
-                                    <small className={styles.creatorInfo}>📝 {creatorName} - יוצר המשימה</small>
-                                </div>
-
-                                <div className={styles.taskActions}>
-                                    <span className={`${styles.statusBadge} ${task.status}`}>
-                                        {task.status === 'completed' ? '✅ בוצע' : '⏳ בהמתנה'}
-                                    </span>
-
-                                    <button
-                                        className={styles.actionBtn}
-                                        onClick={() => handleCompleteTask(task._id, task.status)}
-                                    >
-                                        {task.status === 'completed' ? "↩️ החזר למשימה" : "✔️ סמן כבוצע"}
-                                    </button>
-
-                                    {task.status === 'completed' && isAdmin && (
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={() => handleDeleteTask(task._id)}
-                                        >
-                                            🗑
-                                        </button>
-                                    )}
-                                </div>
-
-                            </li>
-                        );
-                    })}
-                </ul>
             </div>
 
+            {/* טופס יצירת / עריכת משימה */}
+            {showTaskForm && (
+                <div className={styles.modalWrapper}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.closeModal} onClick={() => {
+                            setShowTaskForm(false);
+                            setTaskToEdit(null);
+                        }}>X</button>
+
+                        <TaskForm
+                            teamId={teamId}
+                            taskToEdit={taskToEdit}
+                            isDarkMode={darkMode}
+                            users={Object.entries(users).map(([id, name]) => ({ _id: id, name }))}
+                            onTaskAdded={() => {
+                                fetchTasks();
+                                toast.success("✔️ משימה חדשה נוספה");
+                                setShowTaskForm(false);
+                            }}
+                            onEditComplete={() => {
+                                fetchTasks();
+                                toast.success("✏️ המשימה עודכנה בהצלחה");
+                                setShowTaskForm(false);
+                                setTaskToEdit(null);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* מודל פרטי משימה */}
             {selectedTask && (
                 <div className={styles.modalWrapper}>
                     <div className={styles.modalContent}>
@@ -333,18 +454,14 @@ const Dashboard = () => {
                         <p><span className={styles.label}>📅 תאריך יעד:</span> {formatDate(selectedTask.dueDate)}</p>
                         <p><span className={styles.label}>👤 יוצר:</span> {users[selectedTask.createdBy] || "לא ידוע"}</p>
                         <p><span className={styles.label}>🎯 הוקצתה ל:</span> {users[selectedTask.assignedTo] || "לא ידוע"}</p>
-                        {
-                            isAdmin && (
-                                <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>
-                                    ✏ ערוך משימה
-                                </button>
-                            )
-                        }
-
+                        {isAdmin && (
+                            <button className={styles.editTask} onClick={() => handleEditTask(selectedTask)}>
+                                ✏ ערוך משימה
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
-
         </div>
     );
 };

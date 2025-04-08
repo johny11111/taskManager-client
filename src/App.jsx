@@ -14,6 +14,7 @@ import OAuth2Callback from './pages/OAuth2Callback'
 import { App as CapacitorApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
+import { Toaster } from 'react-hot-toast';
 
 
 
@@ -51,7 +52,7 @@ function App() {
             res = await getMe();
           } catch (err) {
             console.warn("🔄 הטוקן פג תוקף, מנסה לרענן...");
-            res = await refreshToken(); 
+            res = await refreshToken();
           }
 
           if (res?._id) {
@@ -166,6 +167,7 @@ function App() {
 
   return (
     <UserContext.Provider value={{ user, setUser, token, selectedTeam, setSelectedTeam, darkMode }}>
+      <Toaster position="top-center" reverseOrder={false} />
       <Router>
         <header className={`navbar-custom ${darkMode ? styles.navbarDark : styles.navbarLight}`}>
           <div className={styles.container}>

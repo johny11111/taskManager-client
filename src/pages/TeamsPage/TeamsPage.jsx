@@ -10,6 +10,8 @@ const TeamsPage = () => {
   const [teamName, setTeamName] = useState('');
   const { user, darkMode } = useContext(UserContext);
   const navigate = useNavigate();
+  const API_URL = 'https://taskmanager-server-ygfb.onrender.com';
+  //const API_URL = 'http://localhost:5000';
 
   useEffect(() => {
 
@@ -47,7 +49,7 @@ const TeamsPage = () => {
     if (!confirmDelete) return;
 
 
-    const res = await fetch(`https://taskmanager-server-ygfb.onrender.com/api/users/teams/${teamId}`, {
+    const res = await fetch(`${API_URL}/api/users/teams/${teamId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
