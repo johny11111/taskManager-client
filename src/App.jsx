@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import ConnectGoogleCalendar from './components/ConnectGoogleCalendar/ConnectGoogleCalendar';
 import TeamsPage from './pages/TeamsPage/TeamsPage';
+import TeamMembersPage from './pages/TeamMembersPage/TeamMembersPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import { UserContext } from './context/UserContext';
 import './index.css';
@@ -104,6 +105,11 @@ function App() {
       localStorage.setItem('darkMode', 'disabled');
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -222,6 +228,7 @@ function App() {
           <Route path="/register" element={<Register headerHeight={headerHeight} />} />
           <Route path="/teams" element={user ? <TeamsPage /> : <Navigate to="/login" />} />
           <Route path="/dashboard/:teamId" element={<Dashboard />} />
+          <Route path="/teams/:teamId/members" element={<TeamMembersPage />} />
           <Route path="/" element={user ? <Navigate to="/teams" /> : <Navigate to="/login" />} />
         </Routes>
       </Router>

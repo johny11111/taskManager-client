@@ -5,48 +5,48 @@
     background: linear-gradient(135deg, #f3e5f5, #ede7f6);
     color: #333;
     box-sizing: border-box;
-}
-
-.dark {
+  }
+  
+  .dark {
     background: linear-gradient(135deg, #1e1e2f, #2e2e48);
-    color: #fff;
-}
-
-.title {
+    color: #d55de0;
+  }
+  
+  .title {
     text-align: center;
     font-size: 2rem;
     margin-bottom: 1.5rem;
-}
-
-.subTitle {
+  }
+  
+  .subTitle {
     font-size: 1.2rem;
     margin-top: 2rem;
     margin-bottom: 1rem;
-}
-
-/* טופס יצירת צוות */
-.form {
+  }
+  
+  /* טופס יצירת צוות */
+  .form {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     max-width: 400px;
     margin: 0 auto;
-}
-
-.input {
+  }
+  
+  .input {
     padding: 0.6rem;
     font-size: 1rem;
     border: 1px solid #aaa;
     border-radius: 8px;
     box-sizing: border-box;
-}
-
-.input:focus {
+  }
+  
+  .input:focus {
     outline: none;
     border-color: #6A1B9A;
-}
-
-.createBtn {
+  }
+  
+  .createBtn {
     background-color: #6A1B9A;
     color: #fff;
     padding: 0.65rem;
@@ -55,88 +55,146 @@
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
-}
-
-.createBtn:hover {
+  }
+  
+  .createBtn:hover {
     background-color: #4A148C;
-}
-
-/* רשימת צוותים */
-.teamList {
-    list-style: none;
+  }
+  
+  /* רשימת צוותים */
+  .teamList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
     padding: 0;
     margin: 0 auto;
-    max-width: 600px;
-    max-height: 50dvh;
+    max-width: 900px;
+    max-height: 60dvh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #6A1B9A transparent;
-}
-
-.teamList::-webkit-scrollbar {
+  }
+  
+  .teamList::-webkit-scrollbar {
     width: 6px;
-}
-
-.teamList::-webkit-scrollbar-thumb {
+  }
+  
+  .teamList::-webkit-scrollbar-thumb {
     background-color: #bbb;
     border-radius: 4px;
-}
-
-.teamItem {
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .teamItem {
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1rem;
-    margin-bottom: 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.3s;
-}
-
-.teamItem:hover {
-    background-color: #f0f0f0;
-}
-
-.dark .teamItem {
+    transition: transform 0.2s, background-color 0.3s;
+    animation: fadeInUp 0.4s ease both;
+  }
+  
+  .teamItem:hover {
+    background-color: #f3f3f3;
+    transform: translateY(-2px);
+  }
+  
+  .teamItem:nth-child(odd) {
+    background: linear-gradient(to right, #f3e5f5, #e1bee7);
+  }
+  .teamItem:nth-child(even) {
+    background: linear-gradient(to right, #d9cbee, #ccbee8);
+  }
+  
+  .dark .teamItem {
     background-color: #2e2e48;
-}
-
-.teamName {
-    font-weight: 500;
-}
-
-.deleteBtn {
+  }
+  
+  .dark .teamItem:nth-child(odd) {
+    background-color: #3a3a55;
+  }
+  
+  .dark .teamItem:nth-child(even) {
+    background-color: #2e2e48;
+  }
+  
+  .teamName {
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+  }
+  
+  .teamName:hover {
+    color: #6A1B9A;
+    text-decoration: underline;
+  }
+  
+  .teamMeta {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .dark .teamMeta {
+    color: #212020;
+  }
+  
+  .deleteBtn {
     background-color: transparent;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: #f44336;
     cursor: pointer;
-}
-
-.deleteBtn:hover {
+    padding: 0 0.25rem;
+    flex-shrink: 0;
+  }
+  
+  .deleteBtn:hover {
     color: #d32f2f;
-}
-
-/* רספונסיביות */
-@media (max-width: 600px) {
+  }
+  
+  .emptyState {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    color: #777;
+  }
+  
+  .dark .emptyState {
+    color: #aaa;
+  }
+  
+  @media (max-width: 600px) {
     .form {
-        width: 100%;
+      width: 100%;
     }
-
+  
     .input,
     .createBtn {
-        width: 100%;
+      width: 100%;
     }
-
+  
     .teamItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
     }
-
+  
     .teamName {
-        font-size: 1rem;
+      font-size: 1rem;
     }
-}
+  }
+  

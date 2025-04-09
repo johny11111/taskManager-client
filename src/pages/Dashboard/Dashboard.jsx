@@ -4,6 +4,7 @@ import { getTasksByTeam, updateTaskStatus, deleteTask, getTeamMembers, getTeamBy
 import TaskForm from '../../components/TaskForm/TaskForm';
 import styles from "./Dashboard.module.css";
 import { UserContext } from '../../context/UserContext';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
@@ -192,22 +193,22 @@ const Dashboard = () => {
         });
     }, [tasks, selectedTab, searchTerm]);
 
-  
+
 
     const handleSendInvite = async () => {
         if (!inviteEmail.trim()) {
             toast.error('🛑 נא להזין כתובת מייל');
             return;
         }
-    
+
         const storedTeam = localStorage.getItem('teamId');
         const finalTeamId = teamId || storedTeam;
-    
+
         if (!finalTeamId) {
             toast.error('❌ לא נמצא teamId, יש לוודא שאתה נמצא בצוות');
             return;
         }
-    
+
         try {
             const res = await fetch(`${API_URL}/api/users/invite`, {
                 method: 'POST',
@@ -215,9 +216,9 @@ const Dashboard = () => {
                 credentials: 'include',
                 body: JSON.stringify({ email: inviteEmail, teamId: finalTeamId })
             });
-    
+
             const data = await res.json();
-    
+
             if (res.ok) {
                 toast.success('✅ ההזמנה נשלחה בהצלחה!');
                 setInviteEmail('');
@@ -229,7 +230,7 @@ const Dashboard = () => {
             toast.error('❌ שגיאה כללית בשליחת ההזמנה');
         }
     };
-    
+
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
@@ -251,7 +252,21 @@ const Dashboard = () => {
                 </h1>
             </div>
 
-            <p>המשתמש שלך הוא: {isAdmin ? '🧑‍💼 מנהל' : '👤 חבר צוות'}</p>
+            {team && team._id && (
+                <div className={styles.teamInfoRow}>
+                    <p className={styles.userRole}>
+                        {isAdmin ? '🧑‍💼 אתה מנהל הצוות' : '👤 אתה חבר צוות'}
+                    </p>
+                    {isAdmin && (
+                        <Link to={`/teams/${team._id}/members`}>
+                            <button className={styles.manageMembersButton}>
+                                ניהול חברי צוות
+                            </button>
+                        </Link>
+                    )}
+                </div>
+            )}
+
 
             <div className={`${styles.selectTamp} ${hideHeader ? styles.hidden : ''}`}>
                 <div className={styles.filterButtons}>

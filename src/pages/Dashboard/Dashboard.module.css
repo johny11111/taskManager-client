@@ -612,3 +612,53 @@
   }
 }
 
+/* linkto manager member role */
+
+.linkButton {
+  font-size: 0.875rem;
+  color: #2563eb; /* כחול */
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: color 0.2s;
+}
+
+.linkButton:hover {
+  color: #1d4ed8; /* כחול כהה יותר */
+}
+
+.teamInfoRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--background, #f9fafb);
+  border-radius: 1rem;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.userRole {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--foreground, #111827);
+}
+
+.manageMembersButton {
+  background: #2563eb;
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.manageMembersButton:hover {
+  background: #1d4ed8;
+}

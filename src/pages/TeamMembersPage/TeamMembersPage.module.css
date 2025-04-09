@@ -1,0 +1,42 @@
+.wrapper {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    direction: rtl;
+  }
+  
+
+/* כפתור חזור עם אייקון */
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    color: #2563eb;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    transition: color 0.2s;
+  }
+  
+  .backButton:hover {
+    color: #1e40af;
+  }
+  
+  .backIcon {
+    font-size: 1rem;
+  }
+  
+  
+  .title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: var(--foreground, #111);
+  }
+
+  .dark .title {
+    color: #f3f4f6; /* או aliceblue אם אתה רוצה */
+  }
